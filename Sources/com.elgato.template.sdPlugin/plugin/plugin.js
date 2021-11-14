@@ -14,6 +14,7 @@
 
 $SD.on('connected', (jsonObj) => connected(jsonObj));
 
+$SD.on
 function connected(jsn) {
     // Subscribe to the willAppear and other events
     $SD.on('com.elgato.template.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
@@ -21,10 +22,10 @@ function connected(jsn) {
     $SD.on('com.elgato.template.action.sendToPlugin', (jsonObj) => action.onSendToPlugin(jsonObj));
     $SD.on('com.elgato.template.action.didReceiveSettings', (jsonObj) => action.onDidReceiveSettings(jsonObj));
     $SD.on('com.elgato.template.action.propertyInspectorDidAppear', (jsonObj) => {
-        console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[app.js]propertyInspectorDidAppear:');
+        console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[plugin.js]propertyInspectorDidAppear:');
     });
     $SD.on('com.elgato.template.action.propertyInspectorDidDisappear', (jsonObj) => {
-        console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
+        console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[plugin.js]propertyInspectorDidDisappear:');
     });
 };
 
@@ -33,7 +34,7 @@ function connected(jsn) {
 const action = {
     settings:{},
     onDidReceiveSettings: function(jsn) {
-        console.log('%c%s', 'color: white; background: red; font-size: 15px;', '[app.js]onDidReceiveSettings:');
+        console.log('%c%s', 'color: white; background: red; font-size: 15px;', '[plugin.js]onDidReceiveSettings:');
 
         this.settings = Utils.getProp(jsn, 'payload.settings', {});
         this.doSomeThing(this.settings, 'onDidReceiveSettings', 'orange');

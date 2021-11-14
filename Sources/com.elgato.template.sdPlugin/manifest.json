@@ -1,11 +1,11 @@
 {
   "Actions": [
     {
-      "Icon": "action/images/actionimage", 
+      "Icon": "action/assets/actionimage",
       "Name": "Example Action", 
       "States": [
         {
-          "Image": "action/images/action"
+          "Image": "action/assets/action"
         }
       ], 
       "Tooltip": "This is an example tooltip", 
@@ -14,11 +14,11 @@
   ], 
   "SDKVersion": 2,
   "Author": "Elgato Systems", 
-  "CodePath": "index.html", 
-  "PropertyInspectorPath": "propertyinspector/index.html", 
+  "CodePath": "plugin/plugin.html",
+  "PropertyInspectorPath": "inspector/inspector.html",
   "Description": "Example description", 
   "Name": "Stream Deck Template", 
-  "Icon": "action/images/action", 
+  "Icon": "action/assets/action",
   "URL": "https://www.elgato.com/en/gaming/stream-deck", 
   "Version": "1.0.0",
   "OS": [

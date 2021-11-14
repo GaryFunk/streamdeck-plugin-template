@@ -167,7 +167,7 @@ $SD.on('piDataChanged', (returnValue) => {
         }
 
         if (!window.xtWindow || window.xtWindow.closed) {
-            window.xtWindow  = window.open('../externalWindow.html', 'External Window');
+            window.xtWindow  = window.open('../external/external.html', 'External Window');
             setTimeout(() => postMessage(window.xtWindow), 200);
         } else {
            postMessage(window.xtWindow);
@@ -458,7 +458,7 @@ function handleSdpiItemChange(e, idx) {
  * This is a quick and simple way to localize elements and labels in the Property
  * Inspector's UI without touching their values.
  * It uses a quick 'lox()' function, which reads the strings from a global
- * variable 'localizedStrings' (in 'common.js')
+ * variable 'localizedStrings' (in 'deck.js')
  */
 
 // eslint-disable-next-line no-unused-vars

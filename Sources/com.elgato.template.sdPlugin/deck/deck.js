@@ -748,7 +748,7 @@ const StreamDeck = (function () {
 
             const lang = Utils.getProp(inApplicationInfo,'application.language', false);
             if (lang) {
-                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../' : './', function() {
+                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../localization/' : './', function() {
                     events.emit('localizationLoaded', {language:lang});
                 });
             };
@@ -812,7 +812,7 @@ const StreamDeck = (function () {
 
                 if (!jsonObj.hasOwnProperty('action')) {
                     m = jsonObj.event;
-                    // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[common.js]onmessage:', m);
+                    // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
                 } else {
                     switch (inMessageType) {
                     case 'registerPlugin':
