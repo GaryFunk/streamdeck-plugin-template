@@ -1,3 +1,4 @@
 .DS_Store
 .idea/**
-/Sources/DistributionTool
+/src/DistributionTool
+/src/DistributionTool
