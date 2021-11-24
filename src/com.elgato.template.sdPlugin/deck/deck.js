@@ -46,22 +46,6 @@ String.prototype.lox = function () {
     return a;
 };
 
-String.prototype.sprintf = function (inArr) {
-    let i = 0;
-    const args = (inArr && Array.isArray(inArr)) ? inArr : arguments;
-    return this.replace(/%s/g, function () {
-        return args[i++];
-    });
-};
-
-// eslint-disable-next-line no-unused-vars
-const sprintf = (s, ...args) => {
-    let i = 0;
-    return s.replace(/%s/g, function () {
-        return args[i++];
-    });
-};
-
 const loadLocalization = (lang, pathPrefix, cb) => {
     Utils.readJson(`${pathPrefix}${lang}.json`, function (jsn) {
         const manifest = Utils.parseJson(jsn);
@@ -677,28 +661,12 @@ function connectElgatoStreamDeckSocket (
     inApplicationInfo,
     inActionInfo
 ) {
+    const appInfo = JSON.parse(inApplicationInfo);
+    console.log({inPort, inUUID, inMessageType, appInfo, inActionInfo, arguments})
     StreamDeck.getInstance().connect(arguments);
     window.$SD.api = Object.assign({ send: SDApi.send }, SDApi.common, SDApi[inMessageType]);
 }
-
-/* legacy support */
-
-function connectSocket (
-    inPort,
-    inUUID,
-    inMessageType,
-    inApplicationInfo,
-    inActionInfo
-) {
-    connectElgatoStreamDeckSocket(
-        inPort,
-        inUUID,
-        inMessageType,
-        inApplicationInfo,
-        inActionInfo
-    );
-}
-
+const connectSocket = connectElgatoStreamDeckSocket;
 /**
  * StreamDeck object containing all required code to establish
  * communication with SD-Software and the Property Inspector
