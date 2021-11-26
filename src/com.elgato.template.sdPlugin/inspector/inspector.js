@@ -35,40 +35,12 @@ let sdpiWrapper = document.querySelector('.sdpi-wrapper');
 
 let settings;
 
- /**
-  * The 'connected' event is the first event sent to Property Inspector, after it's instance
-  * is registered with Stream Deck software. It carries the current websocket, settings,
-  * and other information about the current environmet in a JSON object.
-  * You can use it to subscribe to events you want to use in your plugin.
-  */
-
 $SD.on('connected', (jsn) => {
-    /**
-     * The passed 'applicationInfo' object contains various information about your
-     * computer, Stream Deck version and OS-settings (e.g. colors as set in your
-     * OSes display preferences.)
-     * We use this to inject some dynamic CSS values (saved in 'common_pi.js'), to allow
-     * drawing proper highlight-colors or progressbars.
-     */
 
-    console.log("connected");
     addDynamicStyles($SD.applicationInfo.colors, 'connectSocket');
 
-    /**
-     * Current settings are passed in the JSON node
-     * {actionInfo: {
-     *      payload: {
-     *          settings: {
-     *                  yoursetting: yourvalue,
-     *                  otherthings: othervalues
-     * ...
-     * To conveniently read those settings, we have a little utility to read
-     * arbitrary values from a JSON object, eg:
-     *
-     * const foundObject = Utils.getProp(JSON-OBJECT, 'path.to.target', defaultValueIfNotFound)
-     */
+    settings = jsn?.actionInfo?.payload?.settings;
 
-    settings = Utils.getProp(jsn, 'actionInfo.payload.settings', false);
     if (settings) {
         updateUI(settings);
     }
@@ -121,43 +93,12 @@ const updateUI = (pl) => {
    })
 }
 
-/**
- * Something in the PI changed:
- * either you clicked a button, dragged a slider or entered some text
- *
- * The 'piDataChanged' event is sent, if data-changes are detected.
- * The changed data are collected in a JSON structure
- *
- * It looks like this:
- *
- *  {
- *      checked: false
- *      group: false
- *      index: 0
- *      key: "mynameinput"
- *      selection: []
- *      value: "Elgato"
- *  }
- *
- * If you set an 'id' to an input-element, this will get the 'key' of this object.
- * The input's value will get the value.
- * There are other fields (e.g.
- *      - 'checked' if you clicked a checkbox
- *      - 'index', if you clicked an element within a group of other elements
- *      - 'selection', if the element allows multiple-selections
- * )
- *
- * Please note:
- * the template creates this object for the most common HTML input-controls.
- * This is a convenient way to start interacting with your plugin quickly.
- *
- */
 
 $SD.on('piDataChanged', (returnValue) => {
 
     console.log('%c%s', 'color: white; background: blue}; font-size: 15px;', 'piDataChanged');
     console.log(returnValue);
-    
+
     if (returnValue.key === 'clickme') {
 
         postMessage = (w) => {
