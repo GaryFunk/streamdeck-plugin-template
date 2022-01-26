@@ -11,6 +11,7 @@
 
 // don't change this to let or const, because we rely on var's hoisting
 // eslint-disable-next-line no-use-before-define, no-var
+
 var $localizedStrings = $localizedStrings || {},
     REMOTESETTINGS = REMOTESETTINGS || {},
     DestinationEnum = Object.freeze({
@@ -21,10 +22,12 @@ var $localizedStrings = $localizedStrings || {},
     // eslint-disable-next-line no-unused-vars
     isQT = navigator.appVersion.includes('QtWebEngine'),
     debug = debug || false,
-    debugLog = function () {},
+    debugLog = function () {
+    },
     MIMAGECACHE = MIMAGECACHE || {};
 
-const setDebugOutput = (debug) => (debug === true) ? console.log.bind(window.console) : function () {};
+const setDebugOutput = (debug) => (debug === true) ? console.log.bind(window.console) : function () {
+};
 debugLog = setDebugOutput(debug);
 
 // Create a wrapper to allow passing JSON to the socket
@@ -42,97 +45,16 @@ String.prototype.lox = function () {
     var a = String(this);
     try {
         a = $localizedStrings[a] || a;
-    } catch (b) {}
+    } catch (b) {
+    }
     return a;
 };
 
-const loadLocalization = (lang, pathPrefix, cb) => {
-    Utils.readJson(`${pathPrefix}${lang}.json`, function (jsn) {
-        const manifest = Utils.parseJson(jsn);
-        $localizedStrings = manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
-        debugLog($localizedStrings);
-        if (cb && typeof cb === 'function') cb();
-    });
+const loadLocalization = async (lang, pathPrefix, cb) => {
+    const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`)
+    $localizedStrings = manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
+    if (cb && typeof cb === 'function') cb();
 }
-
-var Utils = {};
-// TODOZ remove this
-Utils.isCanvas = (value) => {
-    return value instanceof HTMLCanvasElement;
-};
-Utils.setDebugOutput = (debug) => {
-    return (debug === true) ? console.log.bind(window.console) : function () {};
-};
-Utils.randomString = function (len = 8) {
-    return Array.apply(0, Array(len))
-        .map(function () {
-            return (function (charset) {
-                return charset.charAt(
-                    Math.floor(Math.random() * charset.length)
-                );
-            })(
-                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-            );
-        })
-        .join('');
-};
-Utils.measureText = (text, font) => {
-    const canvas = Utils.measureText.canvas || (Utils.measureText.canvas = document.createElement("canvas"));
-    const ctx = canvas.getContext("2d");
-    ctx.font = font || 'bold 10pt system-ui';
-    return ctx.measureText(text).width;
-};
-Utils.hexToRgb = function (hex) {
-    const match = hex.replace(/#/, '').match(/.{1,2}/g);
-    return {
-        r: parseInt(match[0], 16),
-        g: parseInt(match[1], 16),
-        b: parseInt(match[2], 16)
-    };
-};
-Utils.rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
-    return x.toString(16).padStart(2,0)
-}).join('')
-Utils.nscolorToRgb = function (rP, gP, bP) {
-    return {
-        r : Math.round(rP * 255),
-        g : Math.round(gP * 255),
-        b : Math.round(bP * 255)
-    }
-};
-Utils.readJson = function (file, callback) {
-    var req = new XMLHttpRequest();
-    req.onerror = function (e) {
-        // Utils.log(`[Utils][readJson] Error while trying to read  ${file}`, e);
-    };
-    req.overrideMimeType('application/json');
-    req.open('GET', file, true);
-    req.onreadystatechange = function () {
-        if (req.readyState === 4) {
-            // && req.status == "200") {
-            if (callback) callback(req.responseText);
-        }
-    };
-    req.send(null);
-};
-Utils.parseJson = function (jsonString) {
-    if (typeof jsonString === 'object') return jsonString;
-    try {
-        const o = JSON.parse(jsonString);
-
-        // Handle non-exception-throwing cases:
-        // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
-        // but... JSON.parse(null) returns null, and typeof null === "object",
-        // so we must check for that, too. Thankfully, null is falsey, so this suffices:
-        if (o && typeof o === 'object') {
-            return o;
-        }
-    } catch (e) {}
-
-    return false;
-};
-
-window['_'] = Utils;
 
 /*
  * connectElgatoStreamDeckSocket
@@ -147,7 +69,7 @@ window['_'] = Utils;
 
 
 // eslint-disable-next-line no-unused-vars
-function connectElgatoStreamDeckSocket (
+function connectElgatoStreamDeckSocket(
     inPort,
     inUUID,
     inMessageType,
@@ -157,8 +79,9 @@ function connectElgatoStreamDeckSocket (
     const appInfo = JSON.parse(inApplicationInfo);
     console.log({inPort, inUUID, inMessageType, appInfo, inActionInfo, arguments})
     StreamDeck.getInstance().connect(arguments);
-    window.$SD.api = Object.assign({ send: SDApi.send }, SDApi.common, SDApi[inMessageType]);
+    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[inMessageType]);
 }
+
 const connectSocket = connectElgatoStreamDeckSocket;
 /**
  * StreamDeck object containing all required code to establish
@@ -168,11 +91,12 @@ const connectSocket = connectElgatoStreamDeckSocket;
 const StreamDeck = (function () {
     // Hello it's me
     var instance;
+
     /*
       Populate and initialize internally used properties
     */
 
-    function init () {
+    function init() {
         // *** PRIVATE ***
 
         var inPort,
@@ -185,7 +109,7 @@ const StreamDeck = (function () {
         var events = ELGEvents.eventEmitter();
         var logger = SDDebug.logger();
 
-        function showVars () {
+        function showVars() {
             debugLog('---- showVars');
             debugLog('- port', inPort);
             debugLog('- uuid', inUUID);
@@ -195,12 +119,12 @@ const StreamDeck = (function () {
             debugLog('----< showVars');
         }
 
-        function connect (args) {
+        function connect(args) {
             inPort = args[0];
             inUUID = args[1];
             inMessageType = args[2];
-            inApplicationInfo = Utils.parseJson(args[3]);
-            inActionInfo = args[4] !== 'undefined' ? Utils.parseJson(args[4]) : args[4];
+            inApplicationInfo = JsonUtils.parse(args[3]);
+            inActionInfo = args[4] !== 'undefined' ? JsonUtils.parse(args[4]) : args[4];
 
             /** Debug variables */
             if (debug) {
@@ -209,10 +133,11 @@ const StreamDeck = (function () {
 
             const lang = inApplicationInfo?.application?.language ?? false;
             if (lang) {
-                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../localization/' : './', function() {
-                    events.emit('localizationLoaded', {language:lang});
+                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../' : './', function () {
+                    events.emit('localizationLoaded', {language: lang});
                 });
-            };
+            }
+            ;
 
             /** restrict the API to what's possible
              * within Plugin or Property Inspector
@@ -223,7 +148,8 @@ const StreamDeck = (function () {
             if (websocket) {
                 websocket.close();
                 websocket = null;
-            };
+            }
+            ;
 
             websocket = new WebSocket('ws://127.0.0.1:' + inPort);
 
@@ -266,7 +192,7 @@ const StreamDeck = (function () {
             };
 
             websocket.onmessage = function (evt) {
-                var jsonObj = Utils.parseJson(evt.data),
+                var jsonObj = JsonUtils.parse(evt.data),
                     m;
 
                 // console.log('[STREAMDECK] websocket.onmessage ... ', jsonObj.event, jsonObj);
@@ -276,15 +202,15 @@ const StreamDeck = (function () {
                     // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
                 } else {
                     switch (inMessageType) {
-                    case 'registerPlugin':
-                        m = jsonObj['action'] + '.' + jsonObj['event'];
-                        break;
-                    case 'registerPropertyInspector':
-                        m = 'sendToPropertyInspector';
-                        break;
-                    default:
-                        console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
-                        console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
+                        case 'registerPlugin':
+                            m = jsonObj['action'] + '.' + jsonObj['event'];
+                            break;
+                        case 'registerPropertyInspector':
+                            m = 'sendToPropertyInspector';
+                            break;
+                        default:
+                            console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
+                            console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
                     }
                 }
 
@@ -319,8 +245,8 @@ const StreamDeck = (function () {
 })();
 
 // eslint-disable-next-line no-unused-vars
-function initializeControlCenterClient () {
-    const settings = Object.assign(REMOTESETTINGS || {}, { debug: false });
+function initializeControlCenterClient() {
+    const settings = Object.assign(REMOTESETTINGS || {}, {debug: false});
     var $CC = new ControlCenterClient(settings);
     window['$CC'] = $CC;
     return $CC;
@@ -347,10 +273,10 @@ const ELGEvents = {
         const emit = (name, data) =>
             eventList.has(name) && eventList.get(name).pub(data);
 
-        return Object.freeze({ on, has, emit, eventList });
+        return Object.freeze({on, has, emit, eventList});
     },
 
-    pubSub: function pubSub () {
+    pubSub: function pubSub() {
         const subscribers = new Set();
 
         const sub = fn => {
@@ -361,7 +287,7 @@ const ELGEvents = {
         };
 
         const pub = data => subscribers.forEach(fn => fn(data));
-        return Object.freeze({ pub, sub });
+        return Object.freeze({pub, sub});
     }
 };
 
@@ -401,7 +327,7 @@ const SDApi = {
          * This function is non-mutating and thereby creates a new object containing
          * all keys of the original JSON objects.
          */
-        const pl = Object.assign({}, { event: fn, context: context }, payload);
+        const pl = Object.assign({}, {event: fn, context: context}, payload);
 
         /** Check, if we have a connection, and if, send the JSON payload */
         if (debug) {
@@ -528,12 +454,12 @@ const SDApi = {
         },
 
         logMessage: function () {
-           /**
-            * for logMessage we don't need a context, so we allow both
-            * logMessage(unneededContext, 'message')
-            * and
-            * logMessage('message')
-            */
+            /**
+             * for logMessage we don't need a context, so we allow both
+             * logMessage(unneededContext, 'message')
+             * and
+             * logMessage('message')
+             */
 
             let payload = (arguments.length > 1) ? arguments[1] : arguments[0];
 
@@ -572,7 +498,7 @@ const SDApi = {
                 /** verify if type of payload is an object/json */
                 const payload = this[fn]();
                 if (typeof payload === 'object') {
-                    Object.assign({ event: fn, context: context }, payload);
+                    Object.assign({event: fn, context: context}, payload);
                     $SD.connection && $SD.connection.sendJSON(payload);
                 }
             }
@@ -603,7 +529,7 @@ const SDDebug = {
         const logSomething = jsn =>
             console.log('____SDDebug.logger.logSomething');
 
-        return { logEvent, logSomething };
+        return {logEvent, logSomething};
     }
 };
 
@@ -617,7 +543,7 @@ const SDDebug = {
 window.$SD = StreamDeck.getInstance();
 window.$SD.api = SDApi;
 
-function WEBSOCKETERROR (evt) {
+function WEBSOCKETERROR(evt) {
     // Websocket is closed
     var reason = '';
     if (evt.code === 1000) {

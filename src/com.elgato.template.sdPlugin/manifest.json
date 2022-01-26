@@ -2,36 +2,36 @@
   "Actions": [
     {
       "Icon": "action/assets/actionimage",
-      "Name": "Example Action", 
+      "Name": "Example Action",
       "States": [
         {
           "Image": "action/assets/action"
         }
-      ], 
-      "Tooltip": "This is an example tooltip", 
+      ],
+      "Tooltip": "This is an example tooltip",
       "UUID": "com.elgato.template.action"
     }
-  ], 
+  ],
   "SDKVersion": 2,
-  "Author": "Elgato Systems", 
-  "CodePath": "plugin/plugin.html",
+  "Author": "Elgato Systems",
+  "CodePath": "app.html",
   "PropertyInspectorPath": "inspector/inspector.html",
-  "Description": "Example description", 
-  "Name": "Stream Deck Template", 
+  "Description": "Example description",
+  "Name": "Stream Deck Template",
   "Icon": "action/assets/action",
-  "URL": "https://www.elgato.com/en/gaming/stream-deck", 
+  "URL": "https://www.elgato.com/en/gaming/stream-deck",
   "Version": "1.0.0",
   "OS": [
     {
-        "Platform": "mac", 
+        "Platform": "mac",
         "MinimumVersion" : "10.11"
     },
     {
-        "Platform": "windows", 
+        "Platform": "windows",
         "MinimumVersion" : "10"
     }
   ],
-  "Software": 
+  "Software":
     {
         "MinimumVersion" : "4.1"
   }

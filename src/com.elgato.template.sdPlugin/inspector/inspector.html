@@ -6,7 +6,7 @@
         <meta name=apple-mobile-web-app-capable content=yes>
         <meta name=apple-mobile-web-app-status-bar-style content=black>
         <title>com.elgato.template Property Inspector</title>
-        <link rel="stylesheet" href="../shared/css/sdpi.css">
+        <link rel="stylesheet" href="../css/sdpi.css">
     </head>
     <body>
         <div class="sdpi-wrapper">
@@ -17,7 +17,7 @@
             Here we just copied a couple of elements from the PISamples example, which contains
             a huge collection pre-made HTML-elements for you to use.
             Important here is (if you plan to communicate from the Property Inspector to the plugin without
-            further programming), that you add an 'id' to an element's control. 
+            further programming), that you add an 'id' to an element's control.
             This will get the 'key', which is sent to the plugin (or settings), along with the value of
             the control.
           -->
@@ -46,7 +46,8 @@
         </div>
 
         <div class="sdpi-info-label hidden" style="top: -1000;" value=""></div>
-        <script src="../deck/deck.js"></script>
+        <script src="../libs/utils.js"></script>
+        <script src="../deck.js"></script>
         <script src="js/common_pi.js"></script>
         <script src="inspector.js"></script>
     </body>
