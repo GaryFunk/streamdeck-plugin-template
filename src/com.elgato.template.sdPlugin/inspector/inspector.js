@@ -169,7 +169,7 @@ $SD.on('piDataChanged', (returnValue) => {
 
  function sendValueToPlugin(value, prop) {
     console.log("sendValueToPlugin", value, prop);
-    if ($SD.connection && $SD.connection.readyState === 1) {
+    if ($SD.websocket && $SD.websocket.readyState === 1) {
         const json = {
             action: $SD.actionInfo['action'],
             event: 'sendToPlugin',
@@ -180,7 +180,7 @@ $SD.on('piDataChanged', (returnValue) => {
             }
         };
 
-        $SD.connection.send(JSON.stringify(json));
+        $SD.websocket.send(JSON.stringify(json));
     }
 }
 
@@ -404,14 +404,18 @@ function handleSdpiItemChange(e, idx) {
 
 // eslint-disable-next-line no-unused-vars
 function localizeUI() {
+    let localizedText;
     const el = document.querySelector('.sdpi-wrapper') || document;
-    let t;
-    Array.from(el.querySelectorAll('sdpi-item-label')).forEach(e => {
-        t = e.textContent.lox();
-        if (e !== t) {
-            e.innerHTML = e.innerHTML.replace(e.textContent, t);
+
+    Array.from(el.querySelectorAll('.sdpi-item-label')).forEach(e => {
+        const text = e.textContent;
+        localizedText = $SD.localization[text] || text;
+
+        if (e !== localizedText) {
+            e.innerHTML = e.innerHTML.replace(e.textContent, localizedText);
         }
     });
+
     Array.from(el.querySelectorAll('*:not(script)')).forEach(e => {
         if (
             e.childNodes
@@ -419,9 +423,10 @@ function localizeUI() {
             && e.childNodes[0].nodeValue
             && typeof e.childNodes[0].nodeValue === 'string'
         ) {
-            t = e.childNodes[0].nodeValue.lox();
-            if (e.childNodes[0].nodeValue !== t) {
-                e.childNodes[0].nodeValue = t;
+            const text = e.childNodes[0].nodeValue;
+            localizedText = localizedText = $SD.localization[text] || text;
+            if (e.childNodes[0].nodeValue !== localizedText) {
+                e.childNodes[0].nodeValue = localizedText;
             }
         }
     });

@@ -1,35 +1,3 @@
-/* global $SD, $localizedStrings */
-/* exported, $localizedStrings */
-/* eslint no-undef: "error",
-  curly: 0,
-  no-caller: 0,
-  wrap-iife: 0,
-  one-var: 0,
-  no-var: 0,
-  vars-on-top: 0
-*/
-
-// don't change this to let or const, because we rely on var's hoisting
-// eslint-disable-next-line no-use-before-define, no-var
-
-var $localizedStrings = $localizedStrings || {},
-    REMOTESETTINGS = REMOTESETTINGS || {},
-    DestinationEnum = Object.freeze({
-        HARDWARE_AND_SOFTWARE: 0,
-        HARDWARE_ONLY: 1,
-        SOFTWARE_ONLY: 2
-    }),
-    // eslint-disable-next-line no-unused-vars
-    isQT = navigator.appVersion.includes('QtWebEngine'),
-    debug = debug || false,
-    debugLog = function () {
-    },
-    MIMAGECACHE = MIMAGECACHE || {};
-
-const setDebugOutput = (debug) => (debug === true) ? console.log.bind(window.console) : function () {
-};
-debugLog = setDebugOutput(debug);
-
 // Create a wrapper to allow passing JSON to the socket
 WebSocket.prototype.sendJSON = function (jsn, log) {
     if (log) {
@@ -40,32 +8,11 @@ WebSocket.prototype.sendJSON = function (jsn, log) {
     // }
 };
 
-/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.lox = function () {
-    var a = String(this);
-    try {
-        a = $localizedStrings[a] || a;
-    } catch (b) {
-    }
-    return a;
-};
-
-const loadLocalization = async (lang, pathPrefix, cb) => {
-    const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`)
-    $localizedStrings = manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
-    if (cb && typeof cb === 'function') cb();
-}
-
-/*
- * connectElgatoStreamDeckSocket
- * This is the first function StreamDeck Software calls, when
- * establishing the connection to the plugin or the Property Inspector
- * @param {string} inPort - The socket's port to communicate with StreamDeck software.
- * @param {string} inUUID - A unique identifier, which StreamDeck uses to communicate with the plugin
- * @param {string} inMessageType - Identifies, if the event is meant for the property inspector or the plugin.
- * @param {string} inApplicationInfo - Information about the host (StreamDeck) application
- * @param {string} inActionInfo - Context is an internal identifier used to communicate to the host application.
- */
+DestinationEnum = Object.freeze({
+    HARDWARE_AND_SOFTWARE: 0,
+    HARDWARE_ONLY: 1,
+    SOFTWARE_ONLY: 2
+});
 
 /**
  * StreamDeck object containing all required code to establish
@@ -79,14 +26,20 @@ class StreamDeck {
     actionInfo;
     websocket;
     language;
+    localization;
 
     events = ELGEvents.eventEmitter();
-    logger = SDDebug.logger();
     on = this.events.on;
     emit = this.events.emit;
-    /*
-      Populate and initialize internally used properties
-    */
+
+    /**
+     * Connect to Stream Deck
+     * @param port
+     * @param uuid
+     * @param messageType
+     * @param appInfoString
+     * @param actionString
+     */
     connect([port, uuid, messageType, appInfoString, actionString]) {
         this.port = port;
         this.uuid = uuid;
@@ -97,11 +50,10 @@ class StreamDeck {
         this.language = this.appInfo?.application?.language ?? false;
 
         if (this.language) {
-            loadLocalization.call(this, this.language, this.messageType === 'registerPropertyInspector' ? '../' : './', () => {
+            this.loadLocalization(this.language, this.messageType === 'registerPropertyInspector' ? '../' : './', () => {
                 this.events.emit('localizationLoaded', {language: this.language});
             });
         }
-        ;
 
         if (this.websocket) {
             this.websocket.close();
@@ -121,7 +73,7 @@ class StreamDeck {
             $SD.actionInfo = this.actionInfo;
             $SD.applicationInfo = this.appInfo;
             $SD.messageType = this.messageType;
-            $SD.connection = this.websocket;
+            $SD.websocket = this.websocket;
 
             this.emit('connected', {
                 connection: this.websocket,
@@ -133,31 +85,27 @@ class StreamDeck {
             });
         }
 
-        // TODOZ
-        this.websocket.onerror = function (evt) {
+        this.websocket.onerror = (evt) => {
             console.warn('WEBOCKET ERROR', evt, evt.data);
         };
-        // TODOZ
-        this.websocket.onclose = function (evt) {
-            // Websocket is closed
-            var reason = WEBSOCKETERROR(evt);
+
+        this.websocket.onclose = (evt) => {
+            const reason = WEBSOCKETERROR(evt);
             console.warn(
                 '[STREAMDECK]***** WEBOCKET CLOSED **** reason:',
                 reason
             );
         };
-        // TODOZ
-        this.websocket.onmessage = function (evt) {
-            var jsonObj = JsonUtils.parse(evt.data),
-                m;
 
-            // console.log('[STREAMDECK] websocket.onmessage ... ', jsonObj.event, jsonObj);
+        this.websocket.onmessage = (evt) => {
+            let m;
+            const jsonObj = JsonUtils.parse(evt.data);
 
             if (!jsonObj.hasOwnProperty('action')) {
                 m = jsonObj.event;
                 // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
             } else {
-                switch (inMessageType) {
+                switch (this.messageType) {
                     case 'registerPlugin':
                         m = jsonObj['action'] + '.' + jsonObj['event'];
                         break;
@@ -166,15 +114,46 @@ class StreamDeck {
                         break;
                     default:
                         console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
-                        console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
+                        console.warn('UNREGISTERED MESSAGETYPE:', this.messageType);
                 }
             }
 
             if (m && m !== '')
-                events.emit(m, jsonObj);
+                this.events.emit(m, jsonObj);
         };
-        // TODOZ
-        this.connection = this.websocket;
+    }
+
+    /**
+     * Write to log file
+     * @param message
+     */
+    log(message) {
+        try {
+            if (this.websocket) {
+                var json = {
+                    "event": "logMessage",
+                    "payload": {
+                        "message": message
+                    }
+                };
+                this.websocket.send(JSON.stringify(json));
+            }
+        } catch (e) {
+            console.log("Websocket not defined");
+        }
+    }
+
+    /**
+     * Fetches the specified language json file
+     * @param lang
+     * @param pathPrefix
+     * @param cb
+     * @returns {Promise<void>}
+     */
+    async loadLocalization(lang, pathPrefix, cb) {
+        const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`)
+        this.localization = manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
+        if (cb && typeof cb === 'function') cb();
     }
 };
 
@@ -247,31 +226,17 @@ const ELGEvents = {
  */
 
 const SDApi = {
-    send: function (context, fn, payload, debug) {
+    send: function (context, fn, payload) {
         /** Combine the passed JSON with the name of the event and it's context
          * If the payload contains 'event' or 'context' keys, it will overwrite existing 'event' or 'context'.
          * This function is non-mutating and thereby creates a new object containing
          * all keys of the original JSON objects.
          */
         const pl = Object.assign({}, {event: fn, context: context}, payload);
-
-        /** Check, if we have a connection, and if, send the JSON payload */
-        if (debug) {
-            console.log('-----SDApi.send-----');
-            console.log('context', context);
-            console.log(pl);
-            console.log(payload.payload);
-            console.log(JSON.stringify(payload.payload));
-            console.log('-------');
-        }
-        $SD.connection && $SD.connection.sendJSON(pl);
-
-        /**
-         * DEBUG-Utility to quickly show the current payload in the Property Inspector.
-         */
+        $SD.websocket && $SD.websocket.sendJSON(pl);
 
         if (
-            $SD.connection &&
+            $SD.websocket &&
             [
                 'sendToPropertyInspector',
                 'showOK',
@@ -410,9 +375,6 @@ const SDApi = {
         },
 
         debugPrint: function (context, inString) {
-            // console.log("------------ DEBUGPRINT");
-            // console.log([].slice.apply(arguments).join());
-            // console.log("------------ DEBUGPRINT");
             SDApi.send(context, 'debugPrint', {
                 payload: [].slice.apply(arguments).join('.') || ''
             });
@@ -420,12 +382,12 @@ const SDApi = {
 
         dbgSend: function (fn, context) {
             /** lookup if an appropriate function exists */
-            if ($SD.connection && this[fn] && typeof this[fn] === 'function') {
+            if ($SD.websocket && this[fn] && typeof this[fn] === 'function') {
                 /** verify if type of payload is an object/json */
                 const payload = this[fn]();
                 if (typeof payload === 'object') {
                     Object.assign({event: fn, context: context}, payload);
-                    $SD.connection && $SD.connection.sendJSON(payload);
+                    $SD.websocket && $SD.websocket.sendJSON(payload);
                 }
             }
             console.log(this, fn, typeof this[fn], this[fn]());
@@ -434,57 +396,32 @@ const SDApi = {
     }
 };
 
-/** SDDebug
- * Utility to log the JSON structure of an incoming object
- */
-
-const SDDebug = {
-    logger: function (name, fn) {
-        const logEvent = jsn => {
-            console.log('____SDDebug.logger.logEvent');
-            console.log(jsn);
-            debugLog('-->> Received Obj:', jsn);
-            debugLog('jsonObj', jsn);
-            debugLog('event', jsn['event']);
-            debugLog('actionType', jsn['actionType']);
-            debugLog('settings', jsn['settings']);
-            debugLog('coordinates', jsn['coordinates']);
-            debugLog('---');
-        };
-
-        const logSomething = jsn =>
-            console.log('____SDDebug.logger.logSomething');
-
-        return {logEvent, logSomething};
-    }
-};
-
 /**
- * This is the instance of the StreamDeck object.
- * There's only one StreamDeck object, which carries
- * connection parameters and handles communication
- * to/from the software's PluginManager.
+ * connectElgatoStreamDeckSocket
+ * This is the first function StreamDeck Software calls, when
+ * establishing the connection to the plugin or the Property Inspector
+ * @param {string} port - The socket's port to communicate with StreamDeck software.
+ * @param {string} uuid - A unique identifier, which StreamDeck uses to communicate with the plugin
+ * @param {string} messageType - Identifies, if the event is meant for the property inspector or the plugin.
+ * @param {string} appInfoString - Information about the host (StreamDeck) application
+ * @param {string} actionInfo - Context is an internal identifier used to communicate to the host application.
  */
-
-var StreamDeckTest = new StreamDeck();
-
-// eslint-disable-next-line no-unused-vars
 function connectElgatoStreamDeckSocket(
-    inPort,
-    inUUID,
-    inMessageType,
-    inApplicationInfo,
-    inActionInfo
+    port,
+    uuid,
+    messageType,
+    appInfoString,
+    actionInfo
 ) {
-    const appInfo = JSON.parse(inApplicationInfo);
-    console.log({inPort, inUUID, inMessageType, appInfo, inActionInfo, arguments})
-    StreamDeckTest.connect(arguments);
-    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[inMessageType]);
+    const appInfo = JSON.parse(appInfoString);
+    console.log({port, uuid, messageType, appInfo, actionInfo, arguments})
+    window.$SD.connect(arguments);
+    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[messageType]);
 }
 
 const connectSocket = connectElgatoStreamDeckSocket;
 
-window.$SD = StreamDeckTest;
+window.$SD = new StreamDeck();
 window.$SD.api = SDApi;
 
 function WEBSOCKETERROR(evt) {

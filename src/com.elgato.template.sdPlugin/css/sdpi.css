@@ -425,7 +425,7 @@ ol.sdpi-item-value,
 
 .two-items li {
   display: flex;
-}  
+}
 .two-items li > *:first-child {
   flex: 0 0 50%;
   text-align: left;
@@ -479,7 +479,7 @@ td:hover,
 .sdpi-item-value > ul > li:hover:nth-child(even),
 .sdpi-item-value > ol > li:hover:nth-child(even),
 li:hover:nth-child(even),
-li:hover { 
+li:hover {
   background-color: rgba(255,255,255,.1);
 }
 
@@ -583,7 +583,7 @@ details.message:first-child {
 }
 
 details.message h1 {
-  text-align: left;  
+  text-align: left;
 }
 
 .message > summary::-webkit-details-marker {
@@ -709,7 +709,7 @@ input[type="checkbox"] + label {
   -webkit-user-select: none;
 }
 
-input[type="radio"] + label:after, 
+input[type="radio"] + label:after,
 input[type="checkbox"] + label:after {
   content: " " !important;
 }
@@ -937,7 +937,7 @@ textarea {
 /* CAROUSEL */
 
 .sdpi-item[type="carousel"]{
-  
+
 }
 
 .sdpi-item.card-carousel-wrapper,
@@ -1050,27 +1050,27 @@ h1 {
   margin-bottom: 12px;
 }
 
-::-webkit-datetime-edit { 
+::-webkit-datetime-edit {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   background: url(../assets/elg_calendar_inv.svg) no-repeat left center;
   padding-right: 1em;
   padding-left: 25px;
   background-position: 4px 0px;
  }
-::-webkit-datetime-edit-fields-wrapper { 
- 
+::-webkit-datetime-edit-fields-wrapper {
+
  }
 ::-webkit-datetime-edit-text { padding: 0 0.3em; }
 ::-webkit-datetime-edit-month-field { }
 ::-webkit-datetime-edit-day-field {}
 ::-webkit-datetime-edit-year-field {}
-::-webkit-inner-spin-button { 
- 
+::-webkit-inner-spin-button {
+
   /* display: none; */
  }
-::-webkit-calendar-picker-indicator { 
+::-webkit-calendar-picker-indicator {
   background: transparent;
-  font-size: 17px; 
+  font-size: 17px;
 }
 
 ::-webkit-calendar-picker-indicator:focus {
@@ -1104,7 +1104,7 @@ input::-webkit-datetime-edit-fields-wrapper {
 }
 */
 
-/* 
+/*
 input[type="date"] {
   background-color: red;
   outline: none;
@@ -1158,7 +1158,7 @@ label.sdpi-file-label {
 label.sdpi-file-label:active,
 label.sdpi-file-info:active,
 input[type="file"]::-webkit-file-upload-button:active,
-button:active { 
+button:active {
   background-color: var(--sdpi-color);
   color:#303030;
 }
@@ -1190,7 +1190,7 @@ input:required:valid {
   left: 8px;
   display: none;
   color: #fff;
-  border: 8px solid transparent;	
+  border: 8px solid transparent;
   border-bottom: 8px solid #000;
 }
 
@@ -1208,7 +1208,7 @@ input:required:valid {
     opacity: 1;
     position: absolute;
     height: auto;
-  
+
     text-align: center;
     bottom: 2px;
     z-index: 100;
@@ -1274,7 +1274,7 @@ input[type=range] {
   overflow: visible;
 }
 
-/* 
+/*
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   background-color: var(--sdpi-color);
@@ -1337,12 +1337,6 @@ select option:disabled {
 .runningAppsContainer {
   display: none;
 }
-
-/* debug
-div {
-  background-color: rgba(64,128,255,0.2);
-}
-*/
 
 .one-line {
   min-height: 1.5em;
