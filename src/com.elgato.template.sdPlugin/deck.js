@@ -67,190 +67,116 @@ const loadLocalization = async (lang, pathPrefix, cb) => {
  * @param {string} inActionInfo - Context is an internal identifier used to communicate to the host application.
  */
 
-
-// eslint-disable-next-line no-unused-vars
-function connectElgatoStreamDeckSocket(
-    inPort,
-    inUUID,
-    inMessageType,
-    inApplicationInfo,
-    inActionInfo
-) {
-    const appInfo = JSON.parse(inApplicationInfo);
-    console.log({inPort, inUUID, inMessageType, appInfo, inActionInfo, arguments})
-    StreamDeck.getInstance().connect(arguments);
-    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[inMessageType]);
-}
-
-const connectSocket = connectElgatoStreamDeckSocket;
 /**
  * StreamDeck object containing all required code to establish
  * communication with SD-Software and the Property Inspector
  */
+class StreamDeck {
+    port;
+    uuid;
+    messageType;
+    appInfo;
+    actionInfo;
+    websocket;
+    language;
 
-const StreamDeck = (function () {
-    // Hello it's me
-    var instance;
-
+    events = ELGEvents.eventEmitter();
+    logger = SDDebug.logger();
+    on = this.events.on;
+    emit = this.events.emit;
     /*
       Populate and initialize internally used properties
     */
+    connect([port, uuid, messageType, appInfoString, actionString]) {
+        this.port = port;
+        this.uuid = uuid;
+        this.messageType = messageType;
+        this.appInfo = JsonUtils.parse(appInfoString);
+        this.actionInfo = actionString !== 'undefined' ? JsonUtils.parse(actionString) : actionString;
 
-    function init() {
-        // *** PRIVATE ***
+        this.language = this.appInfo?.application?.language ?? false;
 
-        var inPort,
-            inUUID,
-            inMessageType,
-            inApplicationInfo,
-            inActionInfo,
-            websocket = null;
+        if (this.language) {
+            loadLocalization.call(this, this.language, this.messageType === 'registerPropertyInspector' ? '../' : './', () => {
+                this.events.emit('localizationLoaded', {language: this.language});
+            });
+        }
+        ;
 
-        var events = ELGEvents.eventEmitter();
-        var logger = SDDebug.logger();
+        if (this.websocket) {
+            this.websocket.close();
+            this.websocket = null;
+        }
+        ;
+        this.websocket = new WebSocket('ws://127.0.0.1:' + this.port);
 
-        function showVars() {
-            debugLog('---- showVars');
-            debugLog('- port', inPort);
-            debugLog('- uuid', inUUID);
-            debugLog('- messagetype', inMessageType);
-            debugLog('- info', inApplicationInfo);
-            debugLog('- inActionInfo', inActionInfo);
-            debugLog('----< showVars');
+        this.websocket.onopen = () => {
+            const json = {
+                event: this.messageType,
+                uuid: this.uuid
+            };
+
+            this.websocket.sendJSON(json);
+            $SD.uuid = this.uuid;
+            $SD.actionInfo = this.actionInfo;
+            $SD.applicationInfo = this.appInfo;
+            $SD.messageType = this.messageType;
+            $SD.connection = this.websocket;
+
+            this.emit('connected', {
+                connection: this.websocket,
+                port: this.port,
+                uuid: this.uuid,
+                actionInfo: this.actionInfo,
+                applicationInfo: this.appInfo,
+                messageType: this.messageType
+            });
         }
 
-        function connect(args) {
-            inPort = args[0];
-            inUUID = args[1];
-            inMessageType = args[2];
-            inApplicationInfo = JsonUtils.parse(args[3]);
-            inActionInfo = args[4] !== 'undefined' ? JsonUtils.parse(args[4]) : args[4];
-
-            /** Debug variables */
-            if (debug) {
-                showVars();
-            }
-
-            const lang = inApplicationInfo?.application?.language ?? false;
-            if (lang) {
-                loadLocalization(lang, inMessageType === 'registerPropertyInspector' ? '../' : './', function () {
-                    events.emit('localizationLoaded', {language: lang});
-                });
-            }
-            ;
-
-            /** restrict the API to what's possible
-             * within Plugin or Property Inspector
-             * <unused for now>
-             */
-            // $SD.api = SDApi[inMessageType];
-
-            if (websocket) {
-                websocket.close();
-                websocket = null;
-            }
-            ;
-
-            websocket = new WebSocket('ws://127.0.0.1:' + inPort);
-
-            websocket.onopen = function () {
-                var json = {
-                    event: inMessageType,
-                    uuid: inUUID
-                };
-
-                // console.log('***************', inMessageType + "  websocket:onopen", inUUID, json);
-
-                websocket.sendJSON(json);
-                $SD.uuid = inUUID;
-                $SD.actionInfo = inActionInfo;
-                $SD.applicationInfo = inApplicationInfo;
-                $SD.messageType = inMessageType;
-                $SD.connection = websocket;
-
-                instance.emit('connected', {
-                    connection: websocket,
-                    port: inPort,
-                    uuid: inUUID,
-                    actionInfo: inActionInfo,
-                    applicationInfo: inApplicationInfo,
-                    messageType: inMessageType
-                });
-            };
-
-            websocket.onerror = function (evt) {
-                console.warn('WEBOCKET ERROR', evt, evt.data);
-            };
-
-            websocket.onclose = function (evt) {
-                // Websocket is closed
-                var reason = WEBSOCKETERROR(evt);
-                console.warn(
-                    '[STREAMDECK]***** WEBOCKET CLOSED **** reason:',
-                    reason
-                );
-            };
-
-            websocket.onmessage = function (evt) {
-                var jsonObj = JsonUtils.parse(evt.data),
-                    m;
-
-                // console.log('[STREAMDECK] websocket.onmessage ... ', jsonObj.event, jsonObj);
-
-                if (!jsonObj.hasOwnProperty('action')) {
-                    m = jsonObj.event;
-                    // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
-                } else {
-                    switch (inMessageType) {
-                        case 'registerPlugin':
-                            m = jsonObj['action'] + '.' + jsonObj['event'];
-                            break;
-                        case 'registerPropertyInspector':
-                            m = 'sendToPropertyInspector';
-                            break;
-                        default:
-                            console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
-                            console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
-                    }
-                }
-
-                if (m && m !== '')
-                    events.emit(m, jsonObj);
-            };
-
-            instance.connection = websocket;
-        }
-
-        return {
-            // *** PUBLIC ***
-
-            uuid: inUUID,
-            on: events.on,
-            emit: events.emit,
-            connection: websocket,
-            connect: connect,
-            api: null,
-            logger: logger
+        // TODOZ
+        this.websocket.onerror = function (evt) {
+            console.warn('WEBOCKET ERROR', evt, evt.data);
         };
-    }
+        // TODOZ
+        this.websocket.onclose = function (evt) {
+            // Websocket is closed
+            var reason = WEBSOCKETERROR(evt);
+            console.warn(
+                '[STREAMDECK]***** WEBOCKET CLOSED **** reason:',
+                reason
+            );
+        };
+        // TODOZ
+        this.websocket.onmessage = function (evt) {
+            var jsonObj = JsonUtils.parse(evt.data),
+                m;
 
-    return {
-        getInstance: function () {
-            if (!instance) {
-                instance = init();
+            // console.log('[STREAMDECK] websocket.onmessage ... ', jsonObj.event, jsonObj);
+
+            if (!jsonObj.hasOwnProperty('action')) {
+                m = jsonObj.event;
+                // console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
+            } else {
+                switch (inMessageType) {
+                    case 'registerPlugin':
+                        m = jsonObj['action'] + '.' + jsonObj['event'];
+                        break;
+                    case 'registerPropertyInspector':
+                        m = 'sendToPropertyInspector';
+                        break;
+                    default:
+                        console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++');
+                        console.warn('UNREGISTERED MESSAGETYPE:', inMessageType);
+                }
             }
-            return instance;
-        }
-    };
-})();
 
-// eslint-disable-next-line no-unused-vars
-function initializeControlCenterClient() {
-    const settings = Object.assign(REMOTESETTINGS || {}, {debug: false});
-    var $CC = new ControlCenterClient(settings);
-    window['$CC'] = $CC;
-    return $CC;
-}
+            if (m && m !== '')
+                events.emit(m, jsonObj);
+        };
+        // TODOZ
+        this.connection = this.websocket;
+    }
+};
 
 /** ELGEvents
  * Publish/Subscribe pattern to quickly signal events to
@@ -540,7 +466,25 @@ const SDDebug = {
  * to/from the software's PluginManager.
  */
 
-window.$SD = StreamDeck.getInstance();
+var StreamDeckTest = new StreamDeck();
+
+// eslint-disable-next-line no-unused-vars
+function connectElgatoStreamDeckSocket(
+    inPort,
+    inUUID,
+    inMessageType,
+    inApplicationInfo,
+    inActionInfo
+) {
+    const appInfo = JSON.parse(inApplicationInfo);
+    console.log({inPort, inUUID, inMessageType, appInfo, inActionInfo, arguments})
+    StreamDeckTest.connect(arguments);
+    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[inMessageType]);
+}
+
+const connectSocket = connectElgatoStreamDeckSocket;
+
+window.$SD = StreamDeckTest;
 window.$SD.api = SDApi;
 
 function WEBSOCKETERROR(evt) {
