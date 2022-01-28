@@ -12,7 +12,7 @@ class StreamDeck {
     language;
     localization;
 
-    events = ELGEvents.eventEmitter();
+    events = EventHandler.eventEmitter();
     on = this.events.on;
     emit = this.events.emit;
 
@@ -55,7 +55,7 @@ class StreamDeck {
             this.websocket.send(JSON.stringify(json));
             $SD.uuid = this.uuid;
             $SD.actionInfo = this.actionInfo;
-            $SD.applicationInfo = this.appInfo;
+            $SD.appInfo = this.appInfo;
             $SD.messageType = this.messageType;
             $SD.websocket = this.websocket;
 
@@ -64,7 +64,7 @@ class StreamDeck {
                 port: this.port,
                 uuid: this.uuid,
                 actionInfo: this.actionInfo,
-                applicationInfo: this.appInfo,
+                appInfo: this.appInfo,
                 messageType: this.messageType
             });
         }
@@ -113,7 +113,7 @@ class StreamDeck {
     log(message) {
         try {
             if (this.websocket) {
-                var json = {
+                const json = {
                     "event": "logMessage",
                     "payload": {
                         "message": message
@@ -137,45 +137,6 @@ class StreamDeck {
         const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`)
         this.localization = manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
         if (cb && typeof cb === 'function') cb();
-    }
-};
-
-/** ELGEvents
- * Publish/Subscribe pattern to quickly signal events to
- * the plugin, property inspector and data.
- */
-
-const ELGEvents = {
-    eventEmitter: function (name, fn) {
-        const eventList = new Map();
-
-        const on = (name, fn) => {
-            if (!eventList.has(name)) eventList.set(name, ELGEvents.pubSub());
-
-            return eventList.get(name).sub(fn);
-        };
-
-        const has = (name) =>
-            eventList.has(name);
-
-        const emit = (name, data) =>
-            eventList.has(name) && eventList.get(name).pub(data);
-
-        return Object.freeze({on, has, emit, eventList});
-    },
-
-    pubSub: function pubSub() {
-        const subscribers = new Set();
-
-        const sub = fn => {
-            subscribers.add(fn);
-            return () => {
-                subscribers.delete(fn);
-            };
-        };
-
-        const pub = data => subscribers.forEach(fn => fn(data));
-        return Object.freeze({pub, sub});
     }
 };
 
@@ -217,19 +178,6 @@ const SDApi = {
          */
         const pl = Object.assign({}, {event: fn, context: context}, payload);
         $SD.websocket && $SD.websocket.send(JSON.stringify(pl));
-
-        if (
-            $SD.websocket &&
-            [
-                'sendToPropertyInspector',
-                'showOK',
-                'showAlert',
-                'setSettings'
-            ].indexOf(fn) === -1
-        ) {
-            // console.log("send.sendToPropertyInspector", payload);
-            // this.sendToPropertyInspector(context, typeof payload.payload==='object' ? JSON.stringify(payload.payload) : JSON.stringify({'payload':payload.payload}), pl['action']);
-        }
     },
 
     registerPlugin: {
@@ -242,7 +190,6 @@ const SDApi = {
         showOk: function (context) {
             SDApi.send(context, 'showOk', {});
         },
-
 
         setState: function (context, payload) {
             SDApi.send(context, 'setState', {
@@ -275,14 +222,6 @@ const SDApi = {
                 action: action,
                 payload: payload
             });
-        },
-
-        showUrl2: function (context, urlToOpen) {
-            SDApi.send(context, 'openUrl', {
-                payload: {
-                    url: urlToOpen
-                }
-            });
         }
     },
 
@@ -307,7 +246,7 @@ const SDApi = {
 
     common: {
 
-        getSettings: function (context, payload) {
+        getSettings: function (context) {
             SDApi.send(context, 'getSettings', {});
         },
 
@@ -317,7 +256,7 @@ const SDApi = {
             });
         },
 
-        getGlobalSettings: function (context, payload) {
+        getGlobalSettings: function (context) {
             SDApi.send(context, 'getGlobalSettings', {});
         },
 
@@ -352,57 +291,14 @@ const SDApi = {
             });
         },
 
-        test: function () {
-            console.log(this);
-            console.log(SDApi);
-        },
-
         debugPrint: function (context, inString) {
             SDApi.send(context, 'debugPrint', {
                 payload: [].slice.apply(arguments).join('.') || ''
             });
         },
 
-        dbgSend: function (fn, context) {
-            /** lookup if an appropriate function exists */
-            if ($SD.websocket && this[fn] && typeof this[fn] === 'function') {
-                /** verify if type of payload is an object/json */
-                const payload = this[fn]();
-                if (typeof payload === 'object') {
-                    Object.assign({event: fn, context: context}, payload);
-                    $SD.websocket && $SD.websocket.send(JSON.stringify(payload));
-                }
-            }
-            console.log(this, fn, typeof this[fn], this[fn]());
-        }
-
     }
 };
-
-/**
- * connectElgatoStreamDeckSocket
- * This is the first function StreamDeck Software calls, when
- * establishing the connection to the plugin or the Property Inspector
- * @param {string} port - The socket's port to communicate with StreamDeck software.
- * @param {string} uuid - A unique identifier, which StreamDeck uses to communicate with the plugin
- * @param {string} messageType - Identifies, if the event is meant for the property inspector or the plugin.
- * @param {string} appInfoString - Information about the host (StreamDeck) application
- * @param {string} actionInfo - Context is an internal identifier used to communicate to the host application.
- */
-function connectElgatoStreamDeckSocket(
-    port,
-    uuid,
-    messageType,
-    appInfoString,
-    actionInfo
-) {
-    const appInfo = JSON.parse(appInfoString);
-    console.log({port, uuid, messageType, appInfo, actionInfo, arguments})
-    window.$SD.connect(arguments);
-    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[messageType]);
-}
-
-const connectSocket = connectElgatoStreamDeckSocket;
 
 window.$SD = new StreamDeck();
 window.$SD.api = SDApi;

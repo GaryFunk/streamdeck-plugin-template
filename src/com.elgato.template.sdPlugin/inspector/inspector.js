@@ -37,7 +37,7 @@ let settings;
 
 $SD.on('connected', (jsn) => {
 
-    addDynamicStyles($SD.applicationInfo.colors, 'connectSocket');
+    addDynamicStyles($SD.appInfo.colors);
 
     settings = jsn?.actionInfo?.payload?.settings;
 
@@ -103,7 +103,7 @@ $SD.on('piDataChanged', (returnValue) => {
 
         postMessage = (w) => {
             w.postMessage(
-                Object.assign({}, $SD.applicationInfo.application, {action: $SD.actionInfo.action})
+                Object.assign({}, $SD.appInfo.application, {action: $SD.actionInfo.action})
                 ,'*');
         }
 
@@ -298,7 +298,7 @@ function handleSdpiItemChange(e, idx) {
 
     if (e.tagName === 'SPAN') {
         const inp = e.parentNode.querySelector('input');
-        var tmpValue;
+        let tmpValue;
 
         // if there's no attribute set for the span, try to see, if there's a value in the textContent
         // and use it as value
