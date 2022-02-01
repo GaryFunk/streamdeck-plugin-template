@@ -1,10 +1,6 @@
-/* global addDynamicStyles, StreamDeck, Utils */
-/* eslint-disable no-extra-boolean-cast */
-/* eslint-disable no-else-return */
-
 /**
  * This example contains a working Property Inspector, which already communicates
- * with the corresponding plugin throug settings and/or direct messages.
+ * with the corresponding plugin through settings and/or direct messages.
  * If you want to use other control-types, we recommend copy/paste these from the
  * PISamples demo-library, which already contains quite some example DOM elements
  */
@@ -37,8 +33,6 @@ let settings;
 
 StreamDeck.on('connected', (jsn) => {
 
-    addDynamicStyles(StreamDeck.appInfo.colors);
-
     settings = jsn?.actionInfo?.payload?.settings;
 
     if (settings) {
@@ -56,7 +50,7 @@ StreamDeck.on('sendToPropertyInspector', jsn => {
     /**
      *  This is an example, how you could show an error to the user
      */
-     if (pl.hasOwnProperty('error')) {
+    if (pl.hasOwnProperty('error')) {
         sdpiWrapper.innerHTML = `<div class="sdpi-item">
             <details class="message caution">
             <summary class="${pl.hasOwnProperty('info') ? 'pointer' : ''}">${pl.error}</summary>
@@ -90,7 +84,7 @@ const updateUI = (pl) => {
                 }
             }
         }
-   })
+    })
 }
 
 
@@ -104,14 +98,14 @@ StreamDeck.on('piDataChanged', (returnValue) => {
         postMessage = (w) => {
             w.postMessage(
                 Object.assign({}, StreamDeck.appInfo.application, {action: StreamDeck.actionInfo.action})
-                ,'*');
+                , '*');
         }
 
         if (!window.xtWindow || window.xtWindow.closed) {
-            window.xtWindow  = window.open('../external.html', 'External Window');
+            window.xtWindow = window.open('../external.html', 'External Window');
             setTimeout(() => postMessage(window.xtWindow), 200);
         } else {
-           postMessage(window.xtWindow);
+            postMessage(window.xtWindow);
         }
 
     } else {
@@ -141,7 +135,7 @@ StreamDeck.on('piDataChanged', (returnValue) => {
  *
  */
 
- function saveSettings(sdpi_collection) {
+function saveSettings(sdpi_collection) {
 
     if (typeof sdpi_collection !== 'object') return;
 
@@ -153,21 +147,21 @@ StreamDeck.on('piDataChanged', (returnValue) => {
             StreamDeck.setSettings(StreamDeck.uuid, settings);
         }
     }
- }
+}
 
- /**
-  * 'sendValueToPlugin' is a wrapper to send some values to the plugin
-  *
-  * It is called with a value and the name of a property:
-  *
-  * sendValueToPlugin(<any value>), 'key-property')
-  *
-  * where 'key-property' is the property you listen for in your plugin's
-  * 'sendToPlugin' events payload.
-  *
-  */
+/**
+ * 'sendValueToPlugin' is a wrapper to send some values to the plugin
+ *
+ * It is called with a value and the name of a property:
+ *
+ * sendValueToPlugin(<any value>), 'key-property')
+ *
+ * where 'key-property' is the property you listen for in your plugin's
+ * 'sendToPlugin' events payload.
+ *
+ */
 
- function sendValueToPlugin(value, prop) {
+function sendValueToPlugin(value, prop) {
     console.log("sendValueToPlugin", value, prop);
     if (StreamDeck.websocket && StreamDeck.websocket.readyState === 1) {
         const json = {
@@ -218,7 +212,7 @@ function prepareDOMElements(baseElement) {
             if (inputGroup.length === 2) {
                 const offs = inputGroup[0].tagName === 'INPUT' ? 1 : 0;
                 inputGroup[offs].textContent = inputGroup[1 - offs].value;
-                inputGroup[1 - offs]['oninput'] = function() {
+                inputGroup[1 - offs]['oninput'] = function () {
                     inputGroup[offs].textContent = inputGroup[1 - offs].value;
                 };
             }
@@ -228,16 +222,16 @@ function prepareDOMElements(baseElement) {
              */
             Array.from(el.querySelectorAll('.clickable')).forEach(
                 (subel, subi) => {
-                    subel['onclick'] = function(e) {
+                    subel['onclick'] = function (e) {
                         handleSdpiItemChange(e.target, subi);
                     };
                 }
             );
             /** Just in case the found HTML element already has an input or change - event attached,
              * we clone it, and call it in the callback, right before the freshly attached event
-            */
+             */
             const cloneEvt = el[evt];
-            el[evt] = function(e) {
+            el[evt] = function (e) {
                 if (cloneEvt) cloneEvt();
                 handleSdpiItemChange(e.target, i);
             };
@@ -303,9 +297,9 @@ function handleSdpiItemChange(e, idx) {
         // if there's no attribute set for the span, try to see, if there's a value in the textContent
         // and use it as value
         if (!e.hasAttribute('value')) {
-               tmpValue = Number(e.textContent);
+            tmpValue = Number(e.textContent);
             if (typeof tmpValue === 'number' && tmpValue !== null) {
-                e.setAttribute('value', 0+tmpValue); // this is ugly, but setting a value of 0 on a span doesn't do anything
+                e.setAttribute('value', 0 + tmpValue); // this is ugly, but setting a value of 0 on a span doesn't do anything
                 e.value = tmpValue;
             }
         } else {
@@ -335,7 +329,7 @@ function handleSdpiItemChange(e, idx) {
         }
     }
 
-    if (sdpiItemChildren.length && ['radio','checkbox'].includes(sdpiItemChildren[0].type)) {
+    if (sdpiItemChildren.length && ['radio', 'checkbox'].includes(sdpiItemChildren[0].type)) {
         e.setAttribute('_value', e.checked); //'_value' has priority over .value
     }
     if (sdpiItemGroup && !sdpiItemChildren.length) {
@@ -364,12 +358,12 @@ function handleSdpiItemChange(e, idx) {
         value: isList
             ? e.textContent
             : e.hasAttribute('_value')
-            ? e.getAttribute('_value')
-            : e.value
-            ? e.type === 'file'
-                ? decodeURIComponent(e.value.replace(/^C:\\fakepath\\/, ''))
+                ? e.getAttribute('_value')
                 : e.value
-            : e.getAttribute('value'),
+                    ? e.type === 'file'
+                        ? decodeURIComponent(e.value.replace(/^C:\\fakepath\\/, ''))
+                        : e.value
+                    : e.getAttribute('value'),
         group: sdpiItemGroup ? sdpiItemGroup.id : false,
         index: idx,
         selection: selectedElements,
@@ -384,52 +378,15 @@ function handleSdpiItemChange(e, idx) {
         const info = sdpiItem.querySelector('.sdpi-file-info');
         if (info) {
             const s = returnValue.value.split('/').pop();
-            info.textContent =                s.length > 28
-                    ? s.substr(0, 10)
-                      + '...'
-                      + s.substr(s.length - 10, s.length)
-                    : s;
+            info.textContent = s.length > 28
+                ? s.substr(0, 10)
+                + '...'
+                + s.substr(s.length - 10, s.length)
+                : s;
         }
     }
 
     StreamDeck.emit('piDataChanged', returnValue);
-}
-
-/**
- * This is a quick and simple way to localize elements and labels in the Property
- * Inspector's UI without touching their values.
- * It uses a quick 'lox()' function, which reads the strings from a global
- * variable 'localizedStrings' (in 'deck.js')
- */
-
-// eslint-disable-next-line no-unused-vars
-function localizeUI() {
-    let localizedText;
-    const el = document.querySelector('.sdpi-wrapper') || document;
-
-    Array.from(el.querySelectorAll('.sdpi-item-label')).forEach(e => {
-        const text = e.textContent;
-        localizedText = StreamDeck.localization[text] || text;
-
-        if (e !== localizedText) {
-            e.innerHTML = e.innerHTML.replace(e.textContent, localizedText);
-        }
-    });
-
-    Array.from(el.querySelectorAll('*:not(script)')).forEach(e => {
-        if (
-            e.childNodes
-            && e.childNodes.length > 0
-            && e.childNodes[0].nodeValue
-            && typeof e.childNodes[0].nodeValue === 'string'
-        ) {
-            const text = e.childNodes[0].nodeValue;
-            localizedText = localizedText = StreamDeck.localization[text] || text;
-            if (e.childNodes[0].nodeValue !== localizedText) {
-                e.childNodes[0].nodeValue = localizedText;
-            }
-        }
-    });
 }
 
 /**
@@ -438,16 +395,13 @@ function localizeUI() {
  *
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     document.body.classList.add(navigator.userAgent.includes("Mac") ? 'mac' : 'win');
     prepareDOMElements();
-    StreamDeck.on('localizationLoaded', (language) => {
-        localizeUI();
-    });
 });
 
 /** the beforeunload event is fired, right before the PI will remove all nodes */
-window.addEventListener('beforeunload', function(e) {
+window.addEventListener('beforeunload', function (e) {
     e.preventDefault();
     sendValueToPlugin('propertyInspectorWillDisappear', 'property_inspector');
     // Don't set a returnValue to the event, otherwise Chromium with throw an error.  // e.returnValue = '';

@@ -30,8 +30,7 @@ class Deck {
         this.messageType = messageType;
         this.appInfo = JsonUtils.parse(appInfoString);
         this.actionInfo = actionString !== 'undefined' ? JsonUtils.parse(actionString) : actionString;
-
-        this.language = this.appInfo?.application?.language ?? false;
+        this.language = this.appInfo?.application?.language ?? null;
 
         if (this.language) {
             this.loadLocalization(this.language, this.messageType === 'registerPropertyInspector' ? '../' : './', () => {

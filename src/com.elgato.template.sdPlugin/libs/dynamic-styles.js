@@ -1,7 +1,3 @@
-/** Stream Deck software passes system-highlight color information
- * to Property Inspector. Here we 'inject' the CSS styles into the DOM
- * when we receive this information. */
-
 const fadeColor = function (col, amt) {
     const min = Math.min, max = Math.max;
     const num = parseInt(col.replace(/#/g, ''), 16);
@@ -11,7 +7,8 @@ const fadeColor = function (col, amt) {
     return '#' + (g | (b << 8) | (r << 16)).toString(16).padStart(6, 0);
 }
 
-function addDynamicStyles (clrs, fromWhere) {
+StreamDeck.on('connected', (jsn) => {
+    const clrs = StreamDeck.appInfo.colors
     // console.log("addDynamicStyles", clrs.highlightColor, clrs.highlightColor.slice(0, 7));
     const node = document.getElementById('#sdpi-dynamic-styles') || document.createElement('style');
     if (!clrs.mouseDownColor) clrs.mouseDownColor = fadeColor(clrs.highlightColor, -100);
@@ -74,5 +71,4 @@ function addDynamicStyles (clrs, fromWhere) {
     }
     `;
     document.body.appendChild(node);
-};
-
+});
