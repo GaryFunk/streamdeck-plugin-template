@@ -108,7 +108,7 @@ StreamDeck.on('piDataChanged', (returnValue) => {
         }
 
         if (!window.xtWindow || window.xtWindow.closed) {
-            window.xtWindow  = window.open('../external/external.html', 'External Window');
+            window.xtWindow  = window.open('../external.html', 'External Window');
             setTimeout(() => postMessage(window.xtWindow), 200);
         } else {
            postMessage(window.xtWindow);
