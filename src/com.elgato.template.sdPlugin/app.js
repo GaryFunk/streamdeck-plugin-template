@@ -1,4 +1,4 @@
-/* global $CC, Utils, $SD */
+/* global $CC, Utils, StreamDeck */
 /**
  * Here are a couple of wrappers we created to help you quickly setup
  * your plugin and subscribe to events sent by Stream Deck to your plugin.
@@ -11,19 +11,20 @@
  * You can use it to subscribe to events you want to use in your plugin.
  */
 
- $SD.on('connected', (jsonObj) => connected(jsonObj));
+ StreamDeck.on('connected', (jsonObj) => connected(jsonObj));
 
  function connected(jsn) {
+     console.log({jsn})
      // Subscribe to the willAppear and other events
-     $SD.on('com.elgato.template.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
-     $SD.on('com.elgato.template.action.keyUp', (jsonObj) => action.onKeyUp(jsonObj));
-     $SD.on('com.elgato.template.action.sendToPlugin', (jsonObj) => action.onSendToPlugin(jsonObj));
-     $SD.on('com.elgato.template.action.didReceiveSettings', (jsonObj) => action.onDidReceiveSettings(jsonObj));
-     $SD.on('com.elgato.template.action.propertyInspectorDidAppear', (jsonObj) => {
-         console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[plugin.js]propertyInspectorDidAppear:');
+     StreamDeck.on('com.elgato.template.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
+     StreamDeck.on('com.elgato.template.action.keyUp', (jsonObj) => action.onKeyUp(jsonObj));
+     StreamDeck.on('com.elgato.template.action.sendToPlugin', (jsonObj) => action.onSendToPlugin(jsonObj));
+     StreamDeck.on('com.elgato.template.action.didReceiveSettings', (jsonObj) => action.onDidReceiveSettings(jsonObj));
+     StreamDeck.on('com.elgato.template.action.propertyInspectorDidAppear', (jsonObj) => {
+         console.log('%c%s', 'color: white; background: black; font-size: 13px;', '[app.js]propertyInspectorDidAppear:');
      });
-     $SD.on('com.elgato.template.action.propertyInspectorDidDisappear', (jsonObj) => {
-         console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[plugin.js]propertyInspectorDidDisappear:');
+     StreamDeck.on('com.elgato.template.action.propertyInspectorDidDisappear', (jsonObj) => {
+         console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
      });
  };
 
@@ -33,7 +34,7 @@
      settings:{},
      onDidReceiveSettings: function(jsn) {
          console.log(jsn)
-         console.log('%c%s', 'color: white; background: red; font-size: 15px;', '[plugin.js]onDidReceiveSettings:');
+         console.log('%c%s', 'color: white; background: red; font-size: 15px;', '[app.js]onDidReceiveSettings:');
 
          this.settings = jsn?.payload?.settings ?? {};
          this.doSomeThing(this.settings, 'onDidReceiveSettings', 'orange');
@@ -66,7 +67,7 @@
           * 'getSettings' event, which will tell Stream Deck to send your data
           * (in the 'didReceiveSettings above)
           *
-          * $SD.api.getSettings(jsn.context);
+          * StreamDeck.getSettings(jsn.context);
          */
          this.settings = jsn.payload.settings;
 
@@ -106,7 +107,7 @@
              if (sdpi_collection.value && sdpi_collection.value !== undefined) {
                  this.settings[sdpi_collection.key] = sdpi_collection.value;
                  console.log('setSettings....', this.settings);
-                 $SD.api.setSettings(jsn.context, this.settings);
+                 StreamDeck.setSettings(jsn.context, this.settings);
              }
          }
      },
@@ -124,7 +125,7 @@
      setTitle: function(jsn) {
          if (this.settings && this.settings.hasOwnProperty('mynameinput')) {
              console.log("watch the key on your StreamDeck - it got a new title...", this.settings.mynameinput);
-             $SD.api.setTitle(jsn.context, this.settings.mynameinput);
+             StreamDeck.setTitle(jsn.context, this.settings.mynameinput);
          }
      },
 

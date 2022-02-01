@@ -1,4 +1,4 @@
-/* global addDynamicStyles, $SD, Utils */
+/* global addDynamicStyles, StreamDeck, Utils */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable no-else-return */
 
@@ -35,9 +35,9 @@ let sdpiWrapper = document.querySelector('.sdpi-wrapper');
 
 let settings;
 
-$SD.on('connected', (jsn) => {
+StreamDeck.on('connected', (jsn) => {
 
-    addDynamicStyles($SD.appInfo.colors);
+    addDynamicStyles(StreamDeck.appInfo.colors);
 
     settings = jsn?.actionInfo?.payload?.settings;
 
@@ -51,7 +51,7 @@ $SD.on('connected', (jsn) => {
  * to the Property Inspector without saving these messages to the settings.
  */
 
-$SD.on('sendToPropertyInspector', jsn => {
+StreamDeck.on('sendToPropertyInspector', jsn => {
     const pl = jsn.payload;
     /**
      *  This is an example, how you could show an error to the user
@@ -94,7 +94,7 @@ const updateUI = (pl) => {
 }
 
 
-$SD.on('piDataChanged', (returnValue) => {
+StreamDeck.on('piDataChanged', (returnValue) => {
 
     console.log('%c%s', 'color: white; background: blue}; font-size: 15px;', 'piDataChanged');
     console.log(returnValue);
@@ -103,7 +103,7 @@ $SD.on('piDataChanged', (returnValue) => {
 
         postMessage = (w) => {
             w.postMessage(
-                Object.assign({}, $SD.appInfo.application, {action: $SD.actionInfo.action})
+                Object.assign({}, StreamDeck.appInfo.application, {action: StreamDeck.actionInfo.action})
                 ,'*');
         }
 
@@ -150,7 +150,7 @@ $SD.on('piDataChanged', (returnValue) => {
             console.log(sdpi_collection.key, " => ", sdpi_collection.value);
             settings[sdpi_collection.key] = sdpi_collection.value;
             console.log('setSettings....', settings);
-            $SD.api.setSettings($SD.uuid, settings);
+            StreamDeck.setSettings(StreamDeck.uuid, settings);
         }
     }
  }
@@ -169,18 +169,18 @@ $SD.on('piDataChanged', (returnValue) => {
 
  function sendValueToPlugin(value, prop) {
     console.log("sendValueToPlugin", value, prop);
-    if ($SD.websocket && $SD.websocket.readyState === 1) {
+    if (StreamDeck.websocket && StreamDeck.websocket.readyState === 1) {
         const json = {
-            action: $SD.actionInfo['action'],
+            action: StreamDeck.actionInfo['action'],
             event: 'sendToPlugin',
-            context: $SD.uuid,
+            context: StreamDeck.uuid,
             payload: {
                 [prop]: value,
-                targetContext: $SD.actionInfo['context']
+                targetContext: StreamDeck.actionInfo['context']
             }
         };
 
-        $SD.websocket.send(JSON.stringify(json));
+        StreamDeck.websocket.send(JSON.stringify(json));
     }
 }
 
@@ -275,7 +275,7 @@ function prepareDOMElements(baseElement) {
                 } else {
                     path = value;
                 }
-                $SD.api.openUrl($SD.uuid, path);
+                StreamDeck.openUrl(StreamDeck.uuid, path);
             };
         } else {
             console.log(`${value} is not a supported url`);
@@ -392,7 +392,7 @@ function handleSdpiItemChange(e, idx) {
         }
     }
 
-    $SD.emit('piDataChanged', returnValue);
+    StreamDeck.emit('piDataChanged', returnValue);
 }
 
 /**
@@ -409,7 +409,7 @@ function localizeUI() {
 
     Array.from(el.querySelectorAll('.sdpi-item-label')).forEach(e => {
         const text = e.textContent;
-        localizedText = $SD.localization[text] || text;
+        localizedText = StreamDeck.localization[text] || text;
 
         if (e !== localizedText) {
             e.innerHTML = e.innerHTML.replace(e.textContent, localizedText);
@@ -424,7 +424,7 @@ function localizeUI() {
             && typeof e.childNodes[0].nodeValue === 'string'
         ) {
             const text = e.childNodes[0].nodeValue;
-            localizedText = localizedText = $SD.localization[text] || text;
+            localizedText = localizedText = StreamDeck.localization[text] || text;
             if (e.childNodes[0].nodeValue !== localizedText) {
                 e.childNodes[0].nodeValue = localizedText;
             }
@@ -441,7 +441,7 @@ function localizeUI() {
 document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add(navigator.userAgent.includes("Mac") ? 'mac' : 'win');
     prepareDOMElements();
-    $SD.on('localizationLoaded', (language) => {
+    StreamDeck.on('localizationLoaded', (language) => {
         localizeUI();
     });
 });

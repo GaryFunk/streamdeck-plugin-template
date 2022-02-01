@@ -15,6 +15,5 @@ function connectElgatoStreamDeckSocket(
     appInfoString,
     actionInfo
 ) {
-    window.$SD.connect(arguments);
-    window.$SD.api = Object.assign({send: SDApi.send}, SDApi.common, SDApi[messageType]);
+    window.StreamDeck.connect(arguments);
 }

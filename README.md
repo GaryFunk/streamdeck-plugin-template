@@ -52,7 +52,7 @@ and:
 
 `Stream Deck Template` with `Your Plugin Name`
 
-Fire up your preferred code-editor and open `plugin.js`.
+Fire up your preferred code-editor and open `app.js`.
 
 Remove what you don't need and start coding (e.g. in the `onKeyDown` method)
 
