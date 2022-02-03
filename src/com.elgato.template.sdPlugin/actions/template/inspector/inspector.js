@@ -32,7 +32,6 @@ let sdpiWrapper = document.querySelector('.sdpi-wrapper');
 let settings;
 
 StreamDeck.on('connected', (jsn) => {
-
     settings = jsn?.actionInfo?.payload?.settings;
 
     if (settings) {

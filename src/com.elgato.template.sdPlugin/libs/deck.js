@@ -32,12 +32,6 @@ class Deck {
         this.actionInfo = actionString !== 'undefined' ? JsonUtils.parse(actionString) : actionString;
         this.language = this.appInfo?.application?.language ?? null;
 
-        if (this.language) {
-            this.loadLocalization(this.language, this.messageType === 'registerPropertyInspector' ? '../' : './', () => {
-                this.events.emit('localizationLoaded', {language: this.language});
-            });
-        }
-
         if (this.websocket) {
             this.websocket.close();
             this.websocket = null;
@@ -132,10 +126,10 @@ class Deck {
      * @param cb
      * @returns {Promise<void>}
      */
-    async loadLocalization(lang, pathPrefix, cb) {
+    async loadLocalization(lang, pathPrefix) {
         const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`)
         this.localization = manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
-        if (cb && typeof cb === 'function') cb();
+        this.events.emit('localizationLoaded', {language: this.language});
     }
 
     /**
@@ -150,7 +144,7 @@ class Deck {
     }
 
     /**
-     * Request the action's persistent data. This does not return the data, but trigger the action's didReceiveSettings event
+     * Request the actions's persistent data. This does not return the data, but trigger the actions's didReceiveSettings event
      * @type {*}
      */
     getSettings(context) {
@@ -158,7 +152,7 @@ class Deck {
     }
 
     /**
-     * Save the action's persistent data.
+     * Save the actions's persistent data.
      * @param context
      * @param payload
      */
@@ -219,7 +213,7 @@ class Deck {
     }
 
     /**
-     * Display alert on action key
+     * Display alert on actions key
      * @param context
      */
     showAlert(context) {
@@ -227,7 +221,7 @@ class Deck {
     }
 
     /**
-     * Display ok on action key
+     * Display ok on actions key
      * @param context
      */
     showOk(context) {
@@ -235,7 +229,7 @@ class Deck {
     }
 
     /**
-     * Set the state of the action
+     * Set the state of the actions
      * @param context
      * @param payload
      */
@@ -248,7 +242,7 @@ class Deck {
     }
 
     /**
-     * Set the title of the action's key
+     * Set the title of the actions's key
      * @param context
      * @param title
      * @param target
@@ -276,7 +270,7 @@ class Deck {
     }
 
     /**
-     * Set the action key image
+     * Set the actions key image
      * @param context
      * @param img
      * @param target

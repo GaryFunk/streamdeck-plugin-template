@@ -15,5 +15,5 @@ function connectElgatoStreamDeckSocket(
     appInfoString,
     actionInfo
 ) {
-    window.StreamDeck.connect(arguments);
+    StreamDeck.connect(arguments);
 }
