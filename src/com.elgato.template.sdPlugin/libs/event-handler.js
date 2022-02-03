@@ -1,9 +1,9 @@
-window.EventHandler = {
-    eventEmitter: function (name, fn) {
+class EventHandlerClass {
+    eventEmitter(name, fn) {
         const eventList = new Map();
 
         const on = (name, fn) => {
-            if (!eventList.has(name)) eventList.set(name, EventHandler.pubSub());
+            if (!eventList.has(name)) eventList.set(name, this.pubSub());
 
             return eventList.get(name).sub(fn);
         };
@@ -15,9 +15,9 @@ window.EventHandler = {
             eventList.has(name) && eventList.get(name).pub(data);
 
         return Object.freeze({on, has, emit, eventList});
-    },
+    }
 
-    pubSub: function pubSub() {
+    pubSub() {
         const subscribers = new Set();
 
         const sub = fn => {
@@ -31,3 +31,5 @@ window.EventHandler = {
         return Object.freeze({pub, sub});
     }
 };
+
+window.EventHandler = EventHandlerClass;

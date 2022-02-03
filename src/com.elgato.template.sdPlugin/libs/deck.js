@@ -12,7 +12,7 @@ class Deck {
     language;
     localization;
 
-    events = EventHandler.eventEmitter();
+    events = new EventHandler().eventEmitter();
     on = this.events.on;
     emit = this.events.emit;
 
@@ -288,6 +288,10 @@ class Deck {
                 target: target || DestinationEnum.HARDWARE_AND_SOFTWARE
             }
         });
+    }
+
+    registerConnected(fn) {
+        this.on('connected', jsn => fn(jsn));
     }
 };
 
