@@ -1,4 +1,4 @@
-class JsonUtilities {
+class JsonUtils {
     static async read(path) {
         return new Promise((resolve, reject) => {
             const req = new XMLHttpRequest();
@@ -38,5 +38,3 @@ class JsonUtilities {
         return false;
     };
 }
-
-var JsonUtils = JsonUtilities;

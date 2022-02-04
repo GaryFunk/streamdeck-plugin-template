@@ -1,4 +1,4 @@
-class StreamDeckAction {
+class Action {
 	UUID;
 	events;
 	on;
@@ -132,5 +132,3 @@ class StreamDeckAction {
 		this.on(`${this.UUID}.sendToPropertyInspector`, (jsn) => fn(jsn));
 	}
 }
-
-var Action = StreamDeckAction;

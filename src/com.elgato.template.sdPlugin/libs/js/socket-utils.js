@@ -1,4 +1,4 @@
-class SocketUtilities {
+class SocketUtils {
     /**
      * Returns error message for code
      * @param code
@@ -36,5 +36,3 @@ class SocketUtilities {
         }
     }
 }
-
-var SocketUtils = SocketUtilities;

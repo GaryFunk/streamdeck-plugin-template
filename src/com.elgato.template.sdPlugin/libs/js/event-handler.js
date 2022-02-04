@@ -1,4 +1,4 @@
-class EventHandlerClass {
+class EventHandler {
     eventEmitter(name, fn) {
         const eventList = new Map();
 
@@ -31,5 +31,3 @@ class EventHandlerClass {
         return Object.freeze({pub, sub});
     }
 };
-
-var EventHandler = EventHandlerClass;
