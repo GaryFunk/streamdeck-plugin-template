@@ -1,4 +1,5 @@
 /// <reference path="libs/js/action.js" />
+/// <reference path="libs/js/connect.js" />
 
 /**
  * The first event fired when Stream Deck starts
