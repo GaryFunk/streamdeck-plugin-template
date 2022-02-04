@@ -37,4 +37,4 @@ class SocketUtilities {
     }
 }
 
-window.SocketUtils = SocketUtilities;
+var SocketUtils = SocketUtilities;

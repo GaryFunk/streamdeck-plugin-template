@@ -39,4 +39,4 @@ class JsonUtilities {
     };
 }
 
-window.JsonUtils = JsonUtilities;
+var JsonUtils = JsonUtilities;

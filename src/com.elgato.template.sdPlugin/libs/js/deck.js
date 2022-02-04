@@ -213,7 +213,7 @@ class Deck {
     }
 
     /**
-     * Display alert on actions key
+     * Display alert triangle on actions key
      * @param context
      */
     showAlert(context) {
@@ -221,7 +221,7 @@ class Deck {
     }
 
     /**
-     * Display ok on actions key
+     * Display ok check mark on actions key
      * @param context
      */
     showOk(context) {
@@ -284,10 +284,14 @@ class Deck {
         });
     }
 
+    /**
+     * Registers a callback function for when Stream Deck is connected
+     * @param {*} fn 
+     */
     registerConnected(fn) {
         this.on('connected', jsn => fn(jsn));
     }
 };
 
-window.StreamDeck = new Deck();
+var StreamDeck = new Deck();
 

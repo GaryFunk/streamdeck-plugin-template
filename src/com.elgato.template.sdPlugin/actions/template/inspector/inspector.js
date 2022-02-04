@@ -1,3 +1,5 @@
+/// <reference path="../../../libs/js/deck.js" />
+
 /**
  * This example contains a working Property Inspector, which already communicates
  * with the corresponding plugin through settings and/or direct messages.

@@ -32,4 +32,4 @@ class EventHandlerClass {
     }
 };
 
-window.EventHandler = EventHandlerClass;
+var EventHandler = EventHandlerClass;
