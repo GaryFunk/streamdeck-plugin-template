@@ -1,7 +1,5 @@
 /// <reference path="deck.js" />
 
-var StreamDeck = new x();
-
 /**
  * connectElgatoStreamDeckSocket
  * This is the first function StreamDeck Software calls, when
