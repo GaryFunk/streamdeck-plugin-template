@@ -1,8 +1,11 @@
 /**
  * StreamDeck object containing all required code to establish
  * communication with SD-Software and the Property Inspector
+ * 
+ * This name is x to keep it out of your intellisense. 
+ * This class could be given a proper name and changed to hold all static properties in the future...
  */
-class Deck {
+class x {
     port;
     uuid;
     messageType;
@@ -251,7 +254,7 @@ class Deck {
         this.send(context, 'setTitle', {
             payload: {
                 title: '' + title || '',
-                target: target || DestinationEnum.HARDWARE_AND_SOFTWARE
+                target: target || Destination.HARDWARE_AND_SOFTWARE
             }
         });
     }
@@ -279,7 +282,7 @@ class Deck {
         this.send(context, 'setImage', {
             payload: {
                 image: img || '',
-                target: target || DestinationEnum.HARDWARE_AND_SOFTWARE
+                target: target || Destination.HARDWARE_AND_SOFTWARE
             }
         });
     }
@@ -292,6 +295,3 @@ class Deck {
         this.on('connected', jsn => fn(jsn));
     }
 };
-
-var StreamDeck = new Deck();
-
