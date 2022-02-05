@@ -288,9 +288,9 @@ class StreamDeck {
 	 * @param payload
 	 * @param action
 	 */
-	static sendToPropertyInspector(context, payload, action) {
-		StreamDeck.send(context, "sendToPropertyInspector", {
-			action: action,
+	static sendToPropertyInspector(payload) {
+		StreamDeck.send(StreamDeck.uuid, "sendToPropertyInspector", {
+			action: StreamDeck.actionInfo.action,
 			payload: payload,
 		});
 	}
