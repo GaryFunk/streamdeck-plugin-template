@@ -6,6 +6,8 @@
  */
 StreamDeck.registerConnected(({actionInfo, appInfo, connection, messageType, port, uuid}) => {
     const templateAction = new Action('com.elgato.template.action', StreamDeck.events);
+	const templateAction2 = new Action('com.elgato.template.action2', StreamDeck.events);
+
 
     templateAction.registerKeyUp((jsn) => {
         const {action, context, device, event, payload} = jsn;
@@ -15,4 +17,21 @@ StreamDeck.registerConnected(({actionInfo, appInfo, connection, messageType, por
 
         console.log('Your code goes here!');
     });  
+
+	templateAction.registerSendToPlugin((jsn)=>{
+		console.log('sendToPlugin');
+		console.log(jsn)
+	});
+
+templateAction.registerDidReceiveSettings((jsn)=>{
+	console.log('receive settings');
+})
+
+	templateAction2.registerSendToPlugin((jsn)=>{
+		console.log('action 2');
+	})
+
+	templateAction.registerDidReceiveSettings((jsn)=>{
+		console.log('receive settings 222222');
+	})
 })

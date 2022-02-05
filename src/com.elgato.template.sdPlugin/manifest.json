@@ -11,7 +11,19 @@
       "Tooltip": "This is an example tooltip",
       "UUID": "com.elgato.template.action",
       "PropertyInspectorPath": "actions/template/inspector/inspector.html"
-    }
+    },
+	{
+		"Icon": "actions/template/assets/actionimage",
+		"Name": "Example Action 2",
+		"States": [
+		  {
+			"Image": "actions/template/assets/action"
+		  }
+		],
+		"Tooltip": "This is an example tooltip",
+		"UUID": "com.elgato.template.action2",
+		"PropertyInspectorPath": "actions/template/inspector/inspector.html"
+	  }
   ],
   "SDKVersion": 2,
   "Author": "Elgato Systems",
