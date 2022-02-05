@@ -35,7 +35,7 @@ class StreamDeck {
 		StreamDeck.messageType = messageType;
 		StreamDeck.appInfo = JsonUtils.parse(appInfoString);
 		StreamDeck.actionInfo =
-			actionString !== "undefined"
+			actionString !== 'undefined'
 				? JsonUtils.parse(actionString)
 				: actionString;
 		StreamDeck.language = StreamDeck.appInfo?.application?.language ?? null;
@@ -45,7 +45,7 @@ class StreamDeck {
 			StreamDeck.websocket = null;
 		}
 		StreamDeck.websocket = new WebSocket(
-			"ws://127.0.0.1:" + StreamDeck.port
+			'ws://127.0.0.1:' + StreamDeck.port
 		);
 
 		StreamDeck.websocket.onopen = () => {
@@ -61,7 +61,7 @@ class StreamDeck {
 			StreamDeck.messageType = StreamDeck.messageType;
 			StreamDeck.websocket = StreamDeck.websocket;
 
-			StreamDeck.emit("connected", {
+			StreamDeck.emit('connected', {
 				connection: StreamDeck.websocket,
 				port: StreamDeck.port,
 				uuid: StreamDeck.uuid,
@@ -73,7 +73,7 @@ class StreamDeck {
 
 		StreamDeck.websocket.onerror = (evt) => {
 			console.warn(
-				"WEBOCKET ERROR",
+				'WEBOCKET ERROR',
 				evt,
 				evt.data,
 				SocketUtils.getErrorMessage(evt?.code)
@@ -82,7 +82,7 @@ class StreamDeck {
 
 		StreamDeck.websocket.onclose = (evt) => {
 			console.warn(
-				"[STREAMDECK]***** WEBOCKET CLOSED **** reason:",
+				'[STREAMDECK]***** WEBOCKET CLOSED **** reason:',
 				SocketUtils.getErrorMessage(evt?.code)
 			);
 		};
@@ -91,31 +91,31 @@ class StreamDeck {
 			let m;
 			const jsonObj = JsonUtils.parse(evt.data);
 
-			if (!jsonObj.hasOwnProperty("action")) {
+			if (!jsonObj.hasOwnProperty('action')) {
 				m = jsonObj.event;
 				// console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
 			} else {
 				switch (StreamDeck.messageType) {
-					case "registerPlugin":
-						m = jsonObj["action"] + "." + jsonObj["event"];
+					case 'registerPlugin':
+						m = jsonObj['action'] + '.' + jsonObj['event'];
 						break;
-					case "registerPropertyInspector":
-						m = "sendToPropertyInspector";
+					case 'registerPropertyInspector':
+						m = 'sendToPropertyInspector';
 						break;
 					default:
 						console.log(
-							"%c%s",
-							"color: white; background: red; font-size: 12px;",
-							"[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++"
+							'%c%s',
+							'color: white; background: red; font-size: 12px;',
+							'[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++'
 						);
 						console.warn(
-							"UNREGISTERED MESSAGETYPE:",
+							'UNREGISTERED MESSAGETYPE:',
 							StreamDeck.messageType
 						);
 				}
 			}
 
-			if (m && m !== "") StreamDeck.events.emit(m, jsonObj);
+			if (m && m !== '') StreamDeck.events.emit(m, jsonObj);
 		};
 	}
 
@@ -127,7 +127,7 @@ class StreamDeck {
 		try {
 			if (StreamDeck.websocket) {
 				const json = {
-					event: "logMessage",
+					event: 'logMessage',
 					payload: {
 						message: message,
 					},
@@ -135,7 +135,7 @@ class StreamDeck {
 				StreamDeck.websocket.send(JSON.stringify(json));
 			}
 		} catch (e) {
-			console.log("Websocket not defined");
+			console.log('Websocket not defined');
 		}
 	}
 
@@ -149,10 +149,10 @@ class StreamDeck {
 	static async loadLocalization(lang, pathPrefix) {
 		const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`);
 		StreamDeck.localization =
-			manifest && manifest.hasOwnProperty("Localization")
-				? manifest["Localization"]
+			manifest && manifest.hasOwnProperty('Localization')
+				? manifest['Localization']
 				: {};
-		StreamDeck.events.emit("localizationLoaded", {
+		StreamDeck.events.emit('localizationLoaded', {
 			language: StreamDeck.language,
 		});
 	}
@@ -173,16 +173,16 @@ class StreamDeck {
 	 * @type {*}
 	 */
 	static getSettings(context) {
-		StreamDeck.send(context, "getSettings", {});
+		StreamDeck.send(context ?? StreamDeck.uuid, 'getSettings', {});
 	}
 
 	/**
 	 * Save the actions's persistent data.
-	 * @param context
 	 * @param payload
+	 * @param context
 	 */
-	static setSettings(payload) {
-		StreamDeck.send(StreamDeck.uuid, "setSettings", {
+	static setSettings(payload, context) {
+		StreamDeck.send(context ?? StreamDeck.uuid, 'setSettings', {
 			action: StreamDeck?.actionInfo?.action,
 			payload: payload || {},
 			targetContext: StreamDeck?.actionInfo?.context,
@@ -191,30 +191,27 @@ class StreamDeck {
 
 	/**
 	 * Request the plugin's persistent data. StreamDeck does not return the data, but trigger the plugin/property inspectors didReceiveGlobalSettings event
-	 * @param context
 	 */
-	static getGlobalSettings(context) {
-		StreamDeck.send(context, "getGlobalSettings", {});
+	static getGlobalSettings() {
+		StreamDeck.send(StreamDeck.uuid, 'getGlobalSettings', {});
 	}
 
 	/**
 	 * Save the plugin's persistent data
-	 * @param context
 	 * @param payload
 	 */
-	static setGlobalSettings(context, payload) {
-		StreamDeck.send(context, "setGlobalSettings", {
+	static setGlobalSettings(payload) {
+		StreamDeck.send(StreamDeck.uuid, 'setGlobalSettings', {
 			payload: payload,
 		});
 	}
 
 	/**
 	 * Opens a URL in the default web browser
-	 * @param context
 	 * @param urlToOpen
 	 */
-	static openUrl(context, urlToOpen) {
-		StreamDeck.send(context, "openUrl", {
+	static openUrl(urlToOpen) {
+		StreamDeck.send(StreamDeck.uuid, 'openUrl', {
 			payload: {
 				url: urlToOpen,
 			},
@@ -225,10 +222,10 @@ class StreamDeck {
 	 * Send payload from the property inspector to the plugin
 	 * @param payload
 	 */
-	static sendToPlugin(payload) {
+	static sendToPlugin(payload, context) {
 		StreamDeck.send(
-			StreamDeck.uuid,
-			"sendToPlugin",
+			context ?? StreamDeck.uuid,
+			'sendToPlugin',
 			{
 				action: StreamDeck?.actionInfo?.action,
 				payload: payload || {},
@@ -243,7 +240,7 @@ class StreamDeck {
 	 * @param context
 	 */
 	static showAlert(context) {
-		StreamDeck.send(context, "showAlert", {});
+		StreamDeck.send(context, 'showAlert', {});
 	}
 
 	/**
@@ -251,7 +248,7 @@ class StreamDeck {
 	 * @param context
 	 */
 	static showOk(context) {
-		StreamDeck.send(context, "showOk", {});
+		StreamDeck.send(context, 'showOk', {});
 	}
 
 	/**
@@ -260,7 +257,7 @@ class StreamDeck {
 	 * @param payload
 	 */
 	static setState(context, payload) {
-		StreamDeck.send(context, "setState", {
+		StreamDeck.send(context, 'setState', {
 			payload: {
 				state: 1 - Number(payload === 0),
 			},
@@ -274,9 +271,9 @@ class StreamDeck {
 	 * @param target
 	 */
 	static setTitle(context, title, target) {
-		StreamDeck.send(context, "setTitle", {
+		StreamDeck.send(context, 'setTitle', {
 			payload: {
-				title: "" + title || "",
+				title: '' + title || '',
 				target: target || Destination.HARDWARE_AND_SOFTWARE,
 			},
 		});
@@ -288,8 +285,8 @@ class StreamDeck {
 	 * @param payload
 	 * @param action
 	 */
-	static sendToPropertyInspector(payload) {
-		StreamDeck.send(StreamDeck.uuid, "sendToPropertyInspector", {
+	static sendToPropertyInspector(context, payload) {
+		StreamDeck.send(context, 'sendToPropertyInspector', {
 			action: StreamDeck.actionInfo.action,
 			payload: payload,
 		});
@@ -302,9 +299,9 @@ class StreamDeck {
 	 * @param target
 	 */
 	static setImage(context, img, target) {
-		StreamDeck.send(context, "setImage", {
+		StreamDeck.send(context, 'setImage', {
 			payload: {
-				image: img || "",
+				image: img || '',
 				target: target || Destination.HARDWARE_AND_SOFTWARE,
 			},
 		});
@@ -315,18 +312,18 @@ class StreamDeck {
 	 * @param {*} fn
 	 */
 	static registerConnected(fn) {
-		StreamDeck.on("connected", (jsn) => fn(jsn));
+		StreamDeck.on('connected', (jsn) => fn(jsn));
 	}
 
 	static registerSendToPropertyInspector(fn) {
-		StreamDeck.on("sendToPropertyInspector", (jsn) => fn(jsn));
+		StreamDeck.on('sendToPropertyInspector', (jsn) => fn(jsn));
 	}
 
 	static registerPIDataChanged(fn) {
-		StreamDeck.on("piDataChanged", (jsn) => fn(jsn));
+		StreamDeck.on('piDataChanged', (jsn) => fn(jsn));
 	}
 
 	static registerLocalizationLoaded(fn) {
-		StreamDeck.on("localizationLoaded", (jsn) => fn(jsn));
+		StreamDeck.on('localizationLoaded', (jsn) => fn(jsn));
 	}
 }

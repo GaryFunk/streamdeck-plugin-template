@@ -24,7 +24,7 @@ class Action {
 	 * @param {*} fn
 	 */
 	registerDidReceiveGlobalSettings(fn) {
-		this.on(`${this.UUID}.willAppear`, (jsn) => fn(jsn));
+		this.on(`didReceiveGlobalSettings`, (jsn) => fn(jsn));
 	}
 
 	/**

@@ -3,7 +3,9 @@
 
 StreamDeck.registerConnected((jsn) => {
 	const form = document.querySelector('#property-inspector');
-	const settings = jsn?.actionInfo?.payload?.settings;
+	const { actionInfo, appInfo, connection, messageType, port, uuid } = jsn;
+	const { payload, context } = actionInfo;
+	const { settings } = payload;
 
 	FormUtils.setValue(settings, form);
 
@@ -11,7 +13,7 @@ StreamDeck.registerConnected((jsn) => {
 		'input',
 		FormUtils.debounce(200, () => {
 			const value = FormUtils.getValue(form);
-			StreamDeck.sendToPlugin(value);
+			StreamDeck.sendToPlugin(value, context);
 			StreamDeck.setSettings(value);
 		})
 	);
