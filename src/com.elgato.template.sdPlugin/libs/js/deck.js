@@ -1,4 +1,4 @@
-//TODOZ: test all global settings and get settings
+//TODOZ: update jsdocs
 
 /**
  * StreamDeck object containing all required code to establish
