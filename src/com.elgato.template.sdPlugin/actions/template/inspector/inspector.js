@@ -11,7 +11,7 @@ StreamDeck.registerConnected((jsn) => {
 
 	form.addEventListener(
 		'input',
-		FormUtils.debounce(200, () => {
+		FormUtils.debounce(150, () => {
 			const value = FormUtils.getValue(form);
 			StreamDeck.sendToPlugin(value, context);
 			StreamDeck.setSettings(value);

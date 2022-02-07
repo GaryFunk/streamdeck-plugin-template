@@ -1,14 +1,15 @@
+/**
+ * @class Action
+ * A Stream Deck plugin action, where you can register callback functions for different events
+ */
 class Action {
 	UUID;
-	events;
-	on;
-	emit;
+	events = StreamDeck.events;
+	on = StreamDeck.events.on;
+	emit = StreamDeck.events.emit;
 
-	constructor(UUID, events) {
+	constructor(UUID) {
 		this.UUID = UUID;
-		this.events = events;
-		this.on = events.on;
-		this.emit = events.emit;
 	}
 
 	/**
@@ -17,6 +18,7 @@ class Action {
 	 */
 	registerDidReceiveSettings(fn) {
 		this.on(`${this.UUID}.didReceiveSettings`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -25,6 +27,7 @@ class Action {
 	 */
 	registerDidReceiveGlobalSettings(fn) {
 		this.on(`didReceiveGlobalSettings`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -33,6 +36,7 @@ class Action {
 	 */
 	registerKeyDown(fn) {
 		this.on(`${this.UUID}.keyDown`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -41,6 +45,7 @@ class Action {
 	 */
 	registerKeyUp(fn) {
 		this.on(`${this.UUID}.keyUp`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -49,6 +54,7 @@ class Action {
 	 */
 	registerWillAppear(fn) {
 		this.on(`${this.UUID}.willAppear`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -57,6 +63,7 @@ class Action {
 	 */
 	registerTitleParametersDidChange(fn) {
 		this.on(`${this.UUID}.titleParametersDidChange`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -65,6 +72,7 @@ class Action {
 	 */
 	registerDeviceDidConnect(fn) {
 		this.on(`${this.UUID}.deviceDidConnect`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -73,6 +81,7 @@ class Action {
 	 */
 	registerDeviceDidDisconnect(fn) {
 		this.on(`${this.UUID}.deviceDidDisconnect`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -81,6 +90,7 @@ class Action {
 	 */
 	registerApplicationDidLaunch(fn) {
 		this.on(`${this.UUID}.applicationDidLaunch`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -89,6 +99,7 @@ class Action {
 	 */
 	registerApplicationDidTerminate(fn) {
 		this.on(`${this.UUID}.applicationDidTerminate`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -97,6 +108,7 @@ class Action {
 	 */
 	registerSystemDidWakeUp(fn) {
 		this.on(`${this.UUID}.systemDidWakeUp`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -105,8 +117,8 @@ class Action {
 	 */
 	registerPropertyInspectorDidAppear(fn) {
 		this.on(`${this.UUID}.propertyInspectorDidAppear`, (jsn) => fn(jsn));
+		return this;
 	}
-
 
 	/**
 	 * Registers a callback function for the propertyInspectorDidDisappear event, which fires fires when the property inspector is closed
@@ -114,6 +126,7 @@ class Action {
 	 */
 	registerPropertyInspectorDidDisappear(fn) {
 		this.on(`${this.UUID}.propertyInspectorDidDisappear`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -122,6 +135,7 @@ class Action {
 	 */
 	registerSendToPlugin(fn) {
 		this.on(`${this.UUID}.sendToPlugin`, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -130,5 +144,6 @@ class Action {
 	 */
 	registerSendToPropertyInspector(fn) {
 		this.on(`${this.UUID}.sendToPropertyInspector`, (jsn) => fn(jsn));
+		return this;
 	}
 }

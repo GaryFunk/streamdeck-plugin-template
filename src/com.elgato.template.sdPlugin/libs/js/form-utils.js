@@ -49,7 +49,7 @@ class FormUtils {
 
 	/**
 	 * This provides a slight delay before processing rapid events
-	 * @param {*} wait - delay before processing function (recommended time 200ms)
+	 * @param {*} wait - delay before processing function (recommended time 150ms)
 	 * @param {*} fn
 	 * @returns
 	 */

@@ -1,11 +1,7 @@
-//TODOZ: update jsdocs
-
 /**
+ * @class StreamDeck
  * StreamDeck object containing all required code to establish
  * communication with SD-Software and the Property Inspector
- *
- * StreamDeck name is x to keep it out of your intellisense.
- * StreamDeck class could be given a proper name and changed to hold all static properties in the future...
  */
 class StreamDeck {
 	static port;
@@ -35,18 +31,14 @@ class StreamDeck {
 		StreamDeck.messageType = messageType;
 		StreamDeck.appInfo = JsonUtils.parse(appInfoString);
 		StreamDeck.actionInfo =
-			actionString !== 'undefined'
-				? JsonUtils.parse(actionString)
-				: actionString;
+			actionString !== 'undefined' ? JsonUtils.parse(actionString) : actionString;
 		StreamDeck.language = StreamDeck.appInfo?.application?.language ?? null;
 
 		if (StreamDeck.websocket) {
 			StreamDeck.websocket.close();
 			StreamDeck.websocket = null;
 		}
-		StreamDeck.websocket = new WebSocket(
-			'ws://127.0.0.1:' + StreamDeck.port
-		);
+		StreamDeck.websocket = new WebSocket('ws://127.0.0.1:' + StreamDeck.port);
 
 		StreamDeck.websocket.onopen = () => {
 			const json = {
@@ -55,11 +47,6 @@ class StreamDeck {
 			};
 
 			StreamDeck.websocket.send(JSON.stringify(json));
-			StreamDeck.uuid = StreamDeck.uuid;
-			StreamDeck.actionInfo = StreamDeck.actionInfo;
-			StreamDeck.appInfo = StreamDeck.appInfo;
-			StreamDeck.messageType = StreamDeck.messageType;
-			StreamDeck.websocket = StreamDeck.websocket;
 
 			StreamDeck.emit('connected', {
 				connection: StreamDeck.websocket,
@@ -72,12 +59,7 @@ class StreamDeck {
 		};
 
 		StreamDeck.websocket.onerror = (evt) => {
-			console.warn(
-				'WEBOCKET ERROR',
-				evt,
-				evt.data,
-				SocketUtils.getErrorMessage(evt?.code)
-			);
+			console.warn('WEBOCKET ERROR', evt, evt.data, SocketUtils.getErrorMessage(evt?.code));
 		};
 
 		StreamDeck.websocket.onclose = (evt) => {
@@ -108,10 +90,7 @@ class StreamDeck {
 							'color: white; background: red; font-size: 12px;',
 							'[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++'
 						);
-						console.warn(
-							'UNREGISTERED MESSAGETYPE:',
-							StreamDeck.messageType
-						);
+						console.warn('UNREGISTERED MESSAGETYPE:', StreamDeck.messageType);
 				}
 			}
 
@@ -149,9 +128,7 @@ class StreamDeck {
 	static async loadLocalization(lang, pathPrefix) {
 		const manifest = await JsonUtils.read(`${pathPrefix}${lang}.json`);
 		StreamDeck.localization =
-			manifest && manifest.hasOwnProperty('Localization')
-				? manifest['Localization']
-				: {};
+			manifest && manifest.hasOwnProperty('Localization') ? manifest['Localization'] : {};
 		StreamDeck.events.emit('localizationLoaded', {
 			language: StreamDeck.language,
 		});
@@ -170,7 +147,7 @@ class StreamDeck {
 
 	/**
 	 * Request the actions's persistent data. StreamDeck does not return the data, but trigger the actions's didReceiveSettings event
-	 * @type {*}
+	 * @param context
 	 */
 	static getSettings(context) {
 		StreamDeck.send(context ?? StreamDeck.uuid, 'getSettings', {});
@@ -221,6 +198,7 @@ class StreamDeck {
 	/**
 	 * Send payload from the property inspector to the plugin
 	 * @param payload
+	 * @param context
 	 */
 	static sendToPlugin(payload, context) {
 		StreamDeck.send(
@@ -283,7 +261,6 @@ class StreamDeck {
 	 * Send payload to property inspector
 	 * @param context
 	 * @param payload
-	 * @param action
 	 */
 	static sendToPropertyInspector(context, payload) {
 		StreamDeck.send(context, 'sendToPropertyInspector', {
@@ -326,4 +303,18 @@ class StreamDeck {
 	static registerLocalizationLoaded(fn) {
 		StreamDeck.on('localizationLoaded', (jsn) => fn(jsn));
 	}
+}
+
+/**
+ * connectElgatoStreamDeckSocket
+ * This is the first function StreamDeck Software calls, when
+ * establishing the connection to the plugin or the Property Inspector
+ * @param {string} port - The socket's port to communicate with StreamDeck software.
+ * @param {string} uuid - A unique identifier, which StreamDeck uses to communicate with the plugin
+ * @param {string} messageType - Identifies, if the event is meant for the property inspector or the plugin.
+ * @param {string} appInfoString - Information about the host (StreamDeck) application
+ * @param {string} actionInfo - Context is an internal identifier used to communicate to the host application.
+ */
+function connectElgatoStreamDeckSocket(port, uuid, messageType, appInfoString, actionInfo) {
+	StreamDeck.connect(arguments);
 }
