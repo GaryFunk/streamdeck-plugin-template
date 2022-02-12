@@ -79,24 +79,9 @@ class StreamDeck {
         };
 
         this.#websocket.onmessage = (evt) => {
-            let message;
             const data = evt?.data ? JSON.parse(evt.data) : {};
             const {action, event} = data;
-
-            if (!action) {
-                message = event;
-            } else {
-                switch (this.#messageType) {
-                    case REGISTER_PLUGIN:
-                        message = `${action}.${event}`;
-                        break;
-                    case REGISTER_PROPERTY_INSPECTOR:
-                        message = SEND_TO_PROPERTY_INSPECTOR;
-                        break;
-                    default:
-                        this.log(`Invalid message type: ${this.#messageType}`);
-                }
-            }
+            const message = action ? `${action}.${event}` : event;
 
             if (message && message !== '') this.#emit(message, data);
         };
