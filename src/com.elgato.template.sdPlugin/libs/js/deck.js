@@ -321,16 +321,16 @@ class StreamDeck {
 	 * Registers a callback function for when Stream Deck is connected
 	 * @param {*} fn
 	 */
-	registerConnected(fn) {
+	onConnected(fn) {
 		this.#on('connected', (jsn) => fn(jsn));
 	}
 
-	registerSendToPropertyInspector(fn) {
+	/**
+	 * Registers a callback function for when Stream Deck sends data to the property inspector
+	 * @param fn
+	 */
+	onSendToPropertyInspector(fn) {
 		this.#on('sendToPropertyInspector', (jsn) => fn(jsn));
-	}
-
-	registerPIDataChanged(fn) {
-		this.#on('piDataChanged', (jsn) => fn(jsn));
 	}
 }
 

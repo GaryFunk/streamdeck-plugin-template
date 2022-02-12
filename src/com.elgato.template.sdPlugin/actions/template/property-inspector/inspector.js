@@ -3,7 +3,7 @@
 
 const streamDeck = new StreamDeck();
 
-streamDeck.registerConnected((jsn) => {
+streamDeck.onConnected((jsn) => {
 	streamDeck.loadLocalization('../../../');
 
 	const form = document.querySelector('#property-inspector');
