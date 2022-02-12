@@ -6,7 +6,9 @@
  */
 class Action {
     UUID;
-    on = EventHandler.on;
+    #on = EventHandler.on;
+    #removeListener = EventHandler.remove;
+    #removeAllListeners = EventHandler.removeAll;
 
     constructor(UUID) {
         this.UUID = UUID;
@@ -17,7 +19,7 @@ class Action {
      * @param {*} fn
      */
     onDidReceiveSettings(fn) {
-        this.on(`${this.UUID}.${DID_RECEIVE_SETTINGS}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${DID_RECEIVE_SETTINGS}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -26,7 +28,7 @@ class Action {
      * @param {*} fn
      */
     onDidReceiveGlobalSettings(fn) {
-        this.on(DID_RECEIVE_GLOBAL_SETTINGS, (jsn) => fn(jsn));
+        this.#on(DID_RECEIVE_GLOBAL_SETTINGS, (jsn) => fn(jsn));
         return this;
     }
 
@@ -35,7 +37,7 @@ class Action {
      * @param {*} fn
      */
     onKeyDown(fn) {
-        this.on(`${this.UUID}.${KEY_DOWN}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${KEY_DOWN}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -44,7 +46,7 @@ class Action {
      * @param {*} fn
      */
     onKeyUp(fn) {
-        this.on(`${this.UUID}.${KEY_UP}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${KEY_UP}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -53,7 +55,7 @@ class Action {
      * @param {*} fn
      */
     onWillAppear(fn) {
-        this.on(`${this.UUID}.${WILL_APPEAR}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${WILL_APPEAR}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -62,7 +64,7 @@ class Action {
      * @param {*} fn
      */
     onTitleParametersDidChange(fn) {
-        this.on(`${this.UUID}.${TITLE_PARAMETERS_DID_CHANGE}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${TITLE_PARAMETERS_DID_CHANGE}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -71,7 +73,7 @@ class Action {
      * @param {*} fn
      */
     onDeviceDidConnect(fn) {
-        this.on(`${this.UUID}.${DEVICE_DID_CONNECT}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${DEVICE_DID_CONNECT}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -80,7 +82,7 @@ class Action {
      * @param {*} fn
      */
     onDeviceDidDisconnect(fn) {
-        this.on(`${this.UUID}.${DEVICE_DID_DISCONNECT}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${DEVICE_DID_DISCONNECT}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -89,7 +91,7 @@ class Action {
      * @param {*} fn
      */
     onApplicationDidLaunch(fn) {
-        this.on(`${this.UUID}.${APPLICATION_DID_LAUNCH}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${APPLICATION_DID_LAUNCH}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -98,7 +100,7 @@ class Action {
      * @param {*} fn
      */
     onApplicationDidTerminate(fn) {
-        this.on(`${this.UUID}.${APPLICATION_DID_TERMINATE}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${APPLICATION_DID_TERMINATE}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -107,7 +109,7 @@ class Action {
      * @param {*} fn
      */
     onSystemDidWakeUp(fn) {
-        this.on(`${this.UUID}.${SYSTEM_DID_WAKE_UP}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${SYSTEM_DID_WAKE_UP}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -116,7 +118,7 @@ class Action {
      * @param {*} fn
      */
     onPropertyInspectorDidAppear(fn) {
-        this.on(`${this.UUID}.${PROPERTY_INSPECTOR_DID_APPEAR}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${PROPERTY_INSPECTOR_DID_APPEAR}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -125,7 +127,7 @@ class Action {
      * @param {*} fn
      */
     onPropertyInspectorDidDisappear(fn) {
-        this.on(`${this.UUID}.${PROPERTY_INSPECTOR_DID_DISAPPEAR}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${PROPERTY_INSPECTOR_DID_DISAPPEAR}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -134,7 +136,7 @@ class Action {
      * @param {*} fn
      */
     onSendToPlugin(fn) {
-        this.on(`${this.UUID}.${SEND_TO_PLUGIN}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${SEND_TO_PLUGIN}`, (jsn) => fn(jsn));
         return this;
     }
 
@@ -143,7 +145,17 @@ class Action {
      * @param {*} fn
      */
     onSendToPropertyInspector(fn) {
-        this.on(`${this.UUID}.${SEND_TO_PROPERTY_INSPECTOR}`, (jsn) => fn(jsn));
+        this.#on(`${this.UUID}.${SEND_TO_PROPERTY_INSPECTOR}`, (jsn) => fn(jsn));
         return this;
+    }
+
+    /**
+     * Removes the event listener
+     * @param eventName
+     */
+    removeListener(eventName) {
+        if (!eventName) return this.#removeAllListeners(this.UUID);
+        if (eventName === DID_RECEIVE_GLOBAL_SETTINGS) return this.#removeListener(eventName);
+        return this.#removeListener(`${this.UUID}.${eventName}`);
     }
 }

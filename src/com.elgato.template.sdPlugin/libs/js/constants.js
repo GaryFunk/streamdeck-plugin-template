@@ -18,6 +18,9 @@ const SocketErrors = {
     1015: "TLS Handshake. The connection was closed due to a failure to perform a TLS handshake (e.g., the server certificate can't be verified).",
 };
 
+/**
+ * Events
+ */
 const DID_RECEIVE_SETTINGS = 'didReceiveSettings';
 const DID_RECEIVE_GLOBAL_SETTINGS = 'didReceiveGlobalSettings';
 const KEY_DOWN = 'keyDown';
@@ -48,3 +51,10 @@ const REGISTER_PROPERTY_INSPECTOR = 'registerPropertyInspector';
 const REGISTER_PLUGIN = 'registerPlugin';
 const DATA_LOCALIZE = '[data-localize]';
 const LOG_MESSAGE = 'logMessage';
+
+/**
+ * Destination
+ */
+const HARDWARE_AND_SOFTWARE = 0;
+const HARDWARE_ONLY = 1;
+const SOFTWARE_ONLY = 2;

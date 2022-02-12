@@ -17,6 +17,8 @@ class StreamDeck {
     #appInfo;
     #on = EventHandler.on;
     #emit = EventHandler.emit;
+    #removeListener = EventHandler.remove;
+    #removeAllListeners = EventHandler.removeAll;
 
     constructor() {
         if (StreamDeck.__instance) {
@@ -270,7 +272,7 @@ class StreamDeck {
         this.send(context, SET_TITLE, {
             payload: {
                 title: '' + title || '',
-                target: target || Destination.HARDWARE_AND_SOFTWARE,
+                target: target || HARDWARE_AND_SOFTWARE,
             },
         });
     }
@@ -297,7 +299,7 @@ class StreamDeck {
         this.send(context, SET_IMAGE, {
             payload: {
                 image: img || '',
-                target: target || Destination.HARDWARE_AND_SOFTWARE,
+                target: target || HARDWARE_AND_SOFTWARE,
             },
         });
     }
@@ -316,6 +318,15 @@ class StreamDeck {
      */
     onSendToPropertyInspector(fn) {
         this.#on(SEND_TO_PROPERTY_INSPECTOR, (jsn) => fn(jsn));
+    }
+
+    /**
+     * Removes the event listener
+     * @param eventName
+     */
+    removeListener(eventName) {
+        if (!eventName) return this.#removeAllListeners();
+        return this.#removeListener(eventName);
     }
 }
 
