@@ -1,7 +1,12 @@
 /// <reference path="../../../libs/js/deck.js" />
 /// <reference path="../../../libs/js/form-utils.js" />
 
-StreamDeck.registerConnected((jsn) => {
+const streamDeck = new StreamDeck();
+
+streamDeck.registerConnected((jsn) => {
+
+	streamDeck.loadLocalization('../../../');
+
 	const form = document.querySelector('#property-inspector');
 	const { actionInfo, appInfo, connection, messageType, port, uuid } = jsn;
 	const { payload, context } = actionInfo;
@@ -13,8 +18,8 @@ StreamDeck.registerConnected((jsn) => {
 		'input',
 		FormUtils.debounce(150, () => {
 			const value = FormUtils.getValue(form);
-			StreamDeck.sendToPlugin(value, context);
-			StreamDeck.setSettings(value);
+			streamDeck.sendToPlugin(value, context);
+			streamDeck.setSettings(value);
 		})
 	);
 });

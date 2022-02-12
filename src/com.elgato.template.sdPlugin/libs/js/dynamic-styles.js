@@ -1,32 +1,24 @@
 const fadeColor = function (col, amt) {
 	const min = Math.min,
 		max = Math.max;
-	const num = parseInt(col.replace(/#/g, ""), 16);
+	const num = parseInt(col.replace(/#/g, ''), 16);
 	const r = min(255, max((num >> 16) + amt, 0));
 	const g = min(255, max((num & 0x0000ff) + amt, 0));
 	const b = min(255, max(((num >> 8) & 0x00ff) + amt, 0));
-	return "#" + (g | (b << 8) | (r << 16)).toString(16).padStart(6, 0);
+	return '#' + (g | (b << 8) | (r << 16)).toString(16).padStart(6, 0);
 };
 
-StreamDeck.registerConnected((jsn) => {
-	const clrs = StreamDeck.appInfo.colors;
-	// console.log("addDynamicStyles", clrs.highlightColor, clrs.highlightColor.slice(0, 7));
-	const node =
-		document.getElementById("#sdpi-dynamic-styles") ||
-		document.createElement("style");
-	if (!clrs.mouseDownColor)
-		clrs.mouseDownColor = fadeColor(clrs.highlightColor, -100);
+new StreamDeck().registerConnected(({ appInfo }) => {
+	if (appInfo?.colors) return;
+	const clrs = appInfo.colors;
+	const node = document.getElementById('#sdpi-dynamic-styles') || document.createElement('style');
+	if (!clrs.mouseDownColor) clrs.mouseDownColor = fadeColor(clrs.highlightColor, -100);
 	const clr = clrs.highlightColor.slice(0, 7);
 	const clr1 = fadeColor(clr, 100);
 	const clr2 = fadeColor(clr, 60);
 	const metersActiveColor = fadeColor(clr, -60);
 
-	// console.log("%c    ", `background-color: #${clr}`, 'addDS', clr);
-	// console.log("%c    ", `background-color: #${clr1}`, 'addDS1', clr1);
-	// console.log("%c    ", `background-color: #${clr2}`, 'addDS2', clr2);
-	// console.log("%c    ", `background-color: #${metersActiveColor}`, 'metersActiveColor', metersActiveColor);
-
-	node.setAttribute("id", "sdpi-dynamic-styles");
+	node.setAttribute('id', 'sdpi-dynamic-styles');
 	node.innerHTML = `
 
     input[type="radio"]:checked + label span,

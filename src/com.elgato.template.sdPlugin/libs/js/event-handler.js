@@ -1,33 +1,33 @@
 class EventHandler {
-    eventEmitter(name, fn) {
-        const eventList = new Map();
+	static eventList = new Map();
 
-        const on = (name, fn) => {
-            if (!eventList.has(name)) eventList.set(name, this.pubSub());
+	static on(name, fn) {
+		if (!EventHandler.eventList.has(name)) {
+			EventHandler.eventList.set(name, EventHandler.pubSub());
+		}
 
-            return eventList.get(name).sub(fn);
-        };
+		return EventHandler.eventList.get(name).sub(fn);
+	}
 
-        const has = (name) =>
-            eventList.has(name);
+	static has(name) {
+		return EventHandler.eventList.has(name);
+	}
 
-        const emit = (name, data) =>
-            eventList.has(name) && eventList.get(name).pub(data);
+	static emit(name, data) {
+		return EventHandler.eventList.has(name) && EventHandler.eventList.get(name).pub(data);
+	}
 
-        return Object.freeze({on, has, emit, eventList});
-    }
+	static pubSub() {
+		const subscribers = new Set();
 
-    pubSub() {
-        const subscribers = new Set();
+		const sub = (fn) => {
+			subscribers.add(fn);
+			return () => {
+				subscribers.delete(fn);
+			};
+		};
 
-        const sub = fn => {
-            subscribers.add(fn);
-            return () => {
-                subscribers.delete(fn);
-            };
-        };
-
-        const pub = data => subscribers.forEach(fn => fn(data));
-        return Object.freeze({pub, sub});
-    }
-};
+		const pub = (data) => subscribers.forEach((fn) => fn(data));
+		return Object.freeze({ pub, sub });
+	}
+}

@@ -4,9 +4,7 @@
  */
 class Action {
 	UUID;
-	events = StreamDeck.events;
-	on = StreamDeck.events.on;
-	emit = StreamDeck.events.emit;
+	on = EventHandler.on;
 
 	constructor(UUID) {
 		this.UUID = UUID;
