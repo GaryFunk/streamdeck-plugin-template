@@ -1,11 +1,11 @@
 // TODOZ: test other form controls like radio and checkboxes (See previous template code);
-class FormUtils {
+class Utils {
 	/**
 	 * Returns the value from a form using the form controls name property
 	 * @param {*} form 
 	 * @returns 
 	 */
-	static getValue(form) {
+	static getFormValue(form) {
 		if (typeof form === "string") {
 			form = document.querySelector(form);
 		}
@@ -29,7 +29,7 @@ class FormUtils {
 	 * @param {*} jsn 
 	 * @param {*} form 
 	 */
-	static setValue(jsn, form) {
+	static setFormValue(jsn, form) {
 		if (typeof form === "string") {
 			form = document.querySelector(form);
 		}

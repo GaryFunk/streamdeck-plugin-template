@@ -1,4 +1,5 @@
 /// <reference path="event-handler.js" />
+/// <reference path="constants.js" />
 
 /**
  * @class StreamDeck
@@ -38,8 +39,8 @@ class StreamDeck {
 		this.#port = port;
 		this.#uuid = uuid;
 		this.#messageType = messageType;
-		this.#actionInfo = JsonUtils.parse(actionString);
-		this.#appInfo = JsonUtils.parse(appInfoString ?? null);
+		this.#actionInfo = actionString ? JSON.parse(actionString) : null;
+		this.#appInfo = JSON.parse(appInfoString);
 		this.#language = this.#appInfo?.application?.language ?? null;
 
 		if (this.#websocket) {
@@ -68,42 +69,36 @@ class StreamDeck {
 		};
 
 		this.#websocket.onerror = (evt) => {
-			console.warn('WEBOCKET ERROR', evt, evt.data, SocketUtils.getErrorMessage(evt?.code));
+			const error = `WEBOCKET ERROR: ${evt}, ${evt.data}, ${SocketErrors[evt?.code]}`;
+			console.warn(error);
+			this.log(error);
 		};
 
 		this.#websocket.onclose = (evt) => {
-			console.warn(
-				'[STREAMDECK]***** WEBOCKET CLOSED **** reason:',
-				SocketUtils.getErrorMessage(evt?.code)
-			);
+			console.warn('WEBOCKET CLOSED:', SocketErrors[evt?.code]);
 		};
 
 		this.#websocket.onmessage = (evt) => {
-			let m;
-			const jsonObj = JsonUtils.parse(evt.data);
+			let message;
+			const data = evt?.data ? JSON.parse(evt.data) : {};
+			const { action, event } = data;
 
-			if (!jsonObj.hasOwnProperty('action')) {
-				m = jsonObj.event;
-				// console.log('%c%s', 'color: white; background: red; font-size: 12px;', '[deck.js]onmessage:', m);
+			if (!action) {
+				message = event;
 			} else {
 				switch (this.#messageType) {
 					case 'registerPlugin':
-						m = jsonObj['action'] + '.' + jsonObj['event'];
+						message = `${action}.${event}`;
 						break;
 					case 'registerPropertyInspector':
-						m = 'sendToPropertyInspector';
+						message = 'sendToPropertyInspector';
 						break;
 					default:
-						console.log(
-							'%c%s',
-							'color: white; background: red; font-size: 12px;',
-							'[STREAMDECK] websocket.onmessage +++++++++  PROBLEM ++++++++'
-						);
-						console.warn('UNREGISTERED MESSAGETYPE:', this.#messageType);
+						this.log(`Invalid message type: ${this.#messageType}`);
 				}
 			}
 
-			if (m && m !== '') this.#emit(m, jsonObj);
+			if (message && message !== '') this.#emit(message, data);
 		};
 	}
 
@@ -133,7 +128,7 @@ class StreamDeck {
 	 * @returns {Promise<void>}
 	 */
 	async loadLocalization(pathPrefix) {
-		const manifest = await JsonUtils.read(`${pathPrefix}${this.#language}.json`);
+		const manifest = await this.readJson(`${pathPrefix}${this.#language}.json`);
 		this.#localization = manifest['Localization'] ?? null;
 
 		if (this.#messageType === 'registerPropertyInspector' && this.#localization) {
@@ -144,6 +139,32 @@ class StreamDeck {
 					this.#localization[element.textContent] ?? element.textContent;
 			});
 		}
+	}
+
+	/**
+	 *
+	 * @param {*} path
+	 * @returns
+	 */
+	async readJson(path) {
+		return new Promise((resolve, reject) => {
+			const req = new XMLHttpRequest();
+			req.onerror = reject;
+			req.overrideMimeType('application/json');
+			req.open('GET', path, true);
+			req.onreadystatechange = (response) => {
+				if (req.readyState === 4) {
+					const jsonString = response?.target?.response;
+					if (jsonString) {
+						resolve(JSON.parse(response?.target?.response));
+					} else {
+						reject();
+					}
+				}
+			};
+
+			req.send();
+		});
 	}
 
 	/**

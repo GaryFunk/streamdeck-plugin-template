@@ -1,10 +1,9 @@
 /// <reference path="../../../libs/js/deck.js" />
-/// <reference path="../../../libs/js/form-utils.js" />
+/// <reference path="../../../libs/js/utils.js" />
 
 const streamDeck = new StreamDeck();
 
 streamDeck.registerConnected((jsn) => {
-
 	streamDeck.loadLocalization('../../../');
 
 	const form = document.querySelector('#property-inspector');
@@ -12,12 +11,12 @@ streamDeck.registerConnected((jsn) => {
 	const { payload, context } = actionInfo;
 	const { settings } = payload;
 
-	FormUtils.setValue(settings, form);
+	Utils.setFormValue(settings, form);
 
 	form.addEventListener(
 		'input',
-		FormUtils.debounce(150, () => {
-			const value = FormUtils.getValue(form);
+		Utils.debounce(150, () => {
+			const value = Utils.getFormValue(form);
 			streamDeck.sendToPlugin(value, context);
 			streamDeck.setSettings(value);
 		})
