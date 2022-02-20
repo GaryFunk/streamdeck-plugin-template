@@ -7,26 +7,16 @@
  * communication with SD-Software and the Property Inspector
  */
 class StreamDeck {
-    #port;
-    #uuid;
-    #messageType;
-    #actionInfo;
-    #websocket;
-    #language;
-    #localization;
-    #appInfo;
-    #on = EventHandler.on;
-    #emit = EventHandler.emit;
-    #removeListener = EventHandler.remove;
-    #removeAllListeners = EventHandler.removeAll;
-
-    constructor() {
-        if (StreamDeck.__instance) {
-            return StreamDeck.__instance;
-        }
-
-        StreamDeck.__instance = this;
-    }
+    static #port;
+    static #uuid;
+    static #messageType;
+    static #actionInfo;
+    static #websocket;
+    static #language;
+    static #localization;
+    static #appInfo;
+    static #on = EventEmitter.on;
+    static #emit = EventEmitter.emit;
 
     /**
      * Connect to Stream Deck
@@ -37,7 +27,7 @@ class StreamDeck {
      * @param actionString
      * @private
      */
-    connect([port, uuid, messageType, appInfoString, actionString]) {
+    static connect([port, uuid, messageType, appInfoString, actionString]) {
         this.#port = port;
         this.#uuid = uuid;
         this.#messageType = messageType;
@@ -93,7 +83,7 @@ class StreamDeck {
      * Write to log file
      * @param message
      */
-    log(message) {
+    static log(message) {
         try {
             if (this.#websocket) {
                 const json = {
@@ -114,7 +104,7 @@ class StreamDeck {
      * @param pathPrefix
      * @returns {Promise<void>}
      */
-    async loadLocalization(pathPrefix) {
+    static async loadLocalization(pathPrefix) {
         const manifest = await this.readJson(`${pathPrefix}${this.#language}.json`);
         this.#localization = manifest['Localization'] ?? null;
 
@@ -133,7 +123,7 @@ class StreamDeck {
      * @param {*} path
      * @returns
      */
-    async readJson(path) {
+    static async readJson(path) {
         return new Promise((resolve, reject) => {
             const req = new XMLHttpRequest();
             req.onerror = reject;
@@ -160,7 +150,7 @@ class StreamDeck {
      * @param fn
      * @param payload
      */
-    send(context, fn, payload) {
+    static send(context, fn, payload) {
         const pl = Object.assign({}, {event: fn, context: context}, payload);
         this.#websocket && this.#websocket.send(JSON.stringify(pl));
     }
@@ -169,7 +159,7 @@ class StreamDeck {
      * Request the actions's persistent data. StreamDeck does not return the data, but trigger the actions's didReceiveSettings event
      * @param context
      */
-    getSettings(context) {
+    static getSettings(context) {
         this.send(context ?? this.#uuid, GET_SETTINGS, {});
     }
 
@@ -178,7 +168,7 @@ class StreamDeck {
      * @param payload
      * @param context
      */
-    setSettings(payload, context) {
+    static setSettings(payload, context) {
         this.send(context ?? this.#uuid, SET_SETTINGS, {
             action: StreamDeck?.actionInfo?.action,
             payload: payload || {},
@@ -189,7 +179,7 @@ class StreamDeck {
     /**
      * Request the plugin's persistent data. StreamDeck does not return the data, but trigger the plugin/property inspectors didReceiveGlobalSettings event
      */
-    getGlobalSettings() {
+    static getGlobalSettings() {
         this.send(this.#uuid, GET_GLOBAL_SETTINGS, {});
     }
 
@@ -197,7 +187,7 @@ class StreamDeck {
      * Save the plugin's persistent data
      * @param payload
      */
-    setGlobalSettings(payload) {
+    static setGlobalSettings(payload) {
         this.send(this.#uuid, SET_GLOBAL_SETTINGS, {
             payload: payload,
         });
@@ -207,7 +197,7 @@ class StreamDeck {
      * Opens a URL in the default web browser
      * @param urlToOpen
      */
-    openUrl(urlToOpen) {
+    static openUrl(urlToOpen) {
         this.send(this.#uuid, OPEN_URL, {
             payload: {
                 url: urlToOpen,
@@ -220,7 +210,7 @@ class StreamDeck {
      * @param payload
      * @param context
      */
-    sendToPlugin(payload, context) {
+    static sendToPlugin(payload, context) {
         this.send(
             context ?? this.#uuid,
             SEND_TO_PLUGIN,
@@ -237,7 +227,7 @@ class StreamDeck {
      * Display alert triangle on actions key
      * @param context
      */
-    showAlert(context) {
+    static showAlert(context) {
         this.send(context, SHOW_ALERT, {});
     }
 
@@ -245,7 +235,7 @@ class StreamDeck {
      * Display ok check mark on actions key
      * @param context
      */
-    showOk(context) {
+    static showOk(context) {
         this.send(context, SHOW_OK, {});
     }
 
@@ -254,7 +244,7 @@ class StreamDeck {
      * @param context
      * @param payload
      */
-    setState(context, payload) {
+    static setState(context, payload) {
         this.send(context, SET_STATE, {
             payload: {
                 state: 1 - Number(payload === 0),
@@ -268,7 +258,7 @@ class StreamDeck {
      * @param title
      * @param target
      */
-    setTitle(context, title, target) {
+    static setTitle(context, title, target) {
         this.send(context, SET_TITLE, {
             payload: {
                 title: '' + title || '',
@@ -282,7 +272,7 @@ class StreamDeck {
      * @param context
      * @param payload
      */
-    sendToPropertyInspector(context, payload) {
+    static sendToPropertyInspector(context, payload) {
         this.send(context, SEND_TO_PROPERTY_INSPECTOR, {
             action: this.#actionInfo.action,
             payload: payload,
@@ -295,7 +285,7 @@ class StreamDeck {
      * @param img
      * @param target
      */
-    setImage(context, img, target) {
+    static setImage(context, img, target) {
         this.send(context, SET_IMAGE, {
             payload: {
                 image: img || '',
@@ -308,7 +298,7 @@ class StreamDeck {
      * Registers a callback function for when Stream Deck is connected
      * @param {*} fn
      */
-    onConnected(fn) {
+    static onConnected(fn) {
         this.#on(CONNECTED, (jsn) => fn(jsn));
     }
 
@@ -316,17 +306,8 @@ class StreamDeck {
      * Registers a callback function for when Stream Deck sends data to the property inspector
      * @param fn
      */
-    onSendToPropertyInspector(fn) {
+    static onSendToPropertyInspector(fn) {
         this.#on(SEND_TO_PROPERTY_INSPECTOR, (jsn) => fn(jsn));
-    }
-
-    /**
-     * Removes the event listener
-     * @param eventName
-     */
-    removeListener(eventName) {
-        if (!eventName) return this.#removeAllListeners();
-        return this.#removeListener(eventName);
     }
 }
 
@@ -341,5 +322,5 @@ class StreamDeck {
  * @param {string} actionInfo - Context is an internal identifier used to communicate to the host application.
  */
 function connectElgatoStreamDeckSocket() {
-    new StreamDeck().connect(arguments);
+    StreamDeck.connect(arguments);
 }

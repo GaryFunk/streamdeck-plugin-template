@@ -6,9 +6,7 @@
  */
 class Action {
     UUID;
-    #on = EventHandler.on;
-    #removeListener = EventHandler.remove;
-    #removeAllListeners = EventHandler.removeAll;
+    #on = EventEmitter.on;
 
     constructor(UUID) {
         this.UUID = UUID;
@@ -147,15 +145,5 @@ class Action {
     onSendToPropertyInspector(fn) {
         this.#on(`${this.UUID}.${SEND_TO_PROPERTY_INSPECTOR}`, (jsn) => fn(jsn));
         return this;
-    }
-
-    /**
-     * Removes the event listener
-     * @param eventName
-     */
-    removeListener(eventName) {
-        if (!eventName) return this.#removeAllListeners(this.UUID);
-        if (eventName === DID_RECEIVE_GLOBAL_SETTINGS) return this.#removeListener(eventName);
-        return this.#removeListener(`${this.UUID}.${eventName}`);
     }
 }
