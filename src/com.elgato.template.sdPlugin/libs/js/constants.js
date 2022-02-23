@@ -26,6 +26,7 @@ const DID_RECEIVE_GLOBAL_SETTINGS = 'didReceiveGlobalSettings';
 const KEY_DOWN = 'keyDown';
 const KEY_UP = 'keyUp';
 const WILL_APPEAR = 'willAppear';
+const WILL_DISAPPEAR = 'willDisappear';
 const TITLE_PARAMETERS_DID_CHANGE = 'titleParametersDidChange';
 const DEVICE_DID_CONNECT = 'deviceDidConnect';
 const DEVICE_DID_DISCONNECT = 'deviceDidDisconnect';

@@ -58,6 +58,15 @@ class Action {
 	}
 
 	/**
+	 * Registers a callback function for the willAppear event, which fires when an action appears on they key
+	 * @param {*} fn
+	 */
+	onWillDisappear(fn) {
+		this.#on(`${this.UUID}.${WILL_DISAPPEAR}`, (jsn) => fn(jsn));
+		return this;
+	}
+
+	/**
 	 * Registers a callback function for the titleParametersDidChange event, which fires when a user changes the key title
 	 * @param {*} fn
 	 */
