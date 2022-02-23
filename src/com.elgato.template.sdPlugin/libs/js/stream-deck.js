@@ -1,4 +1,4 @@
-/// <reference path="event-handler.js" />
+/// <reference path="event-emitter.js" />
 /// <reference path="constants.js" />
 
 /**
@@ -72,7 +72,7 @@ class StreamDeck {
 
 		this.#websocket.onmessage = (evt) => {
 			const data = evt?.data ? JSON.parse(evt.data) : {};
-			const { action, event } = data;
+			const {action, event} = data;
 			const message = action ? `${action}.${event}` : event;
 
 			if (message && message !== '') this.#emit(message, data);
@@ -151,7 +151,7 @@ class StreamDeck {
 	 * @param payload
 	 */
 	static send(context, fn, payload) {
-		const pl = Object.assign({}, { event: fn, context: context }, payload);
+		const pl = Object.assign({}, {event: fn, context: context}, payload);
 		this.#websocket && this.#websocket.send(JSON.stringify(pl));
 	}
 
@@ -300,7 +300,6 @@ class StreamDeck {
 	 */
 	static onConnected(fn) {
 		this.#on(CONNECTED, (jsn) => fn(jsn));
-		return this;
 	}
 
 	/**
@@ -309,52 +308,46 @@ class StreamDeck {
 	 */
 	static onSendToPropertyInspector(fn) {
 		this.#on(SEND_TO_PROPERTY_INSPECTOR, (jsn) => fn(jsn));
-		return this;
 	}
 
 	/**
 	 * Registers a callback function for the deviceDidConnect event, which fires when a device is plugged in
 	 * @param {*} fn
 	 */
-	onDeviceDidConnect(fn) {
+	static onDeviceDidConnect(fn) {
 		this.#on(DEVICE_DID_CONNECT, (jsn) => fn(jsn));
-		return this;
 	}
 
 	/**
 	 * Registers a callback function for the deviceDidDisconnect event, which fires when a device is unplugged
 	 * @param {*} fn
 	 */
-	onDeviceDidDisconnect(fn) {
+	static onDeviceDidDisconnect(fn) {
 		this.#on(DEVICE_DID_DISCONNECT, (jsn) => fn(jsn));
-		return this;
 	}
 
 	/**
 	 * Registers a callback function for the applicationDidLaunch event, which fires when the application starts
 	 * @param {*} fn
 	 */
-	onApplicationDidLaunch(fn) {
+	static onApplicationDidLaunch(fn) {
 		this.#on(APPLICATION_DID_LAUNCH, (jsn) => fn(jsn));
-		return this;
 	}
 
 	/**
 	 * Registers a callback function for the applicationDidTerminate event, which fires when the application exits
 	 * @param {*} fn
 	 */
-	onApplicationDidTerminate(fn) {
+	static onApplicationDidTerminate(fn) {
 		this.#on(APPLICATION_DID_TERMINATE, (jsn) => fn(jsn));
-		return this;
 	}
 
 	/**
 	 * Registers a callback function for the systemDidWakeUp event, which fires when the computer wakes
 	 * @param {*} fn
 	 */
-	onSystemDidWakeUp(fn) {
+	static onSystemDidWakeUp(fn) {
 		this.#on(SYSTEM_DID_WAKE_UP, (jsn) => fn(jsn));
-		return this;
 	}
 }
 
