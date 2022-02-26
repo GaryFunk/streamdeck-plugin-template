@@ -13,14 +13,14 @@ You can check out the documentation [here](https://developer.elgato.com/document
 
 ### Replace Name
 
-`com.elgato.template` with `my.domain.plugin`
+`com.chektek.template` with `my.domain.plugin`
 
 ### Start Coding
 
 You can get started in app.js!
 
 ```javascript
-streamDeck.onConnected(({actionInfo, appInfo, connection, messageType, port, uuid}) => {
+StreamDeck.onConnected(({actionInfo, appInfo, connection, messageType, port, uuid}) => {
     const myAction = new Action('my.domain.plugin.action');
 
     myAction.onKeyUp(({action, context, device, event, payload}) => {

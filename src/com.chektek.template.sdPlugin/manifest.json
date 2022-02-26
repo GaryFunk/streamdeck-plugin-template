@@ -9,17 +9,17 @@
 				}
 			],
 			"Tooltip": "This is an example tooltip",
-			"UUID": "com.elgato.template.action",
+			"UUID": "com.chektek.template.action",
 			"PropertyInspectorPath": "actions/template/property-inspector/inspector.html"
 		}
 	],
 	"SDKVersion": 2,
-	"Author": "Elgato Systems",
+	"Author": "ChekTek LLC",
 	"CodePath": "app.html",
 	"Description": "Example description",
 	"Name": "Stream Deck Template",
 	"Icon": "actions/template/assets/action",
-	"URL": "https://www.elgato.com/en/gaming/stream-deck",
+	"URL": "https://www.chektek.com/",
 	"Version": "1.0.0",
 	"OS": [
 		{

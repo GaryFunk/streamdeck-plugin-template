@@ -5,7 +5,7 @@
  * The first event fired when Stream Deck starts
  */
 StreamDeck.onConnected(({actionInfo, appInfo, connection, messageType, port, uuid}) => {
-    const myAction = new Action('com.elgato.template.action');
+    const myAction = new Action('com.chektek.template.action');
 
     myAction.onKeyUp(({action, context, device, event, payload}) => {
         StreamDeck.openUrl('https://developer.elgato.com/documentation/stream-deck/sdk/overview/');
