@@ -300,6 +300,7 @@ class StreamDeck {
 	 */
 	static onConnected(fn) {
 		this.#on(CONNECTED, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -308,6 +309,7 @@ class StreamDeck {
 	 */
 	static onSendToPropertyInspector(fn) {
 		this.#on(SEND_TO_PROPERTY_INSPECTOR, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -316,6 +318,7 @@ class StreamDeck {
 	 */
 	static onDeviceDidConnect(fn) {
 		this.#on(DEVICE_DID_CONNECT, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -324,6 +327,7 @@ class StreamDeck {
 	 */
 	static onDeviceDidDisconnect(fn) {
 		this.#on(DEVICE_DID_DISCONNECT, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -332,6 +336,7 @@ class StreamDeck {
 	 */
 	static onApplicationDidLaunch(fn) {
 		this.#on(APPLICATION_DID_LAUNCH, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -340,6 +345,7 @@ class StreamDeck {
 	 */
 	static onApplicationDidTerminate(fn) {
 		this.#on(APPLICATION_DID_TERMINATE, (jsn) => fn(jsn));
+		return this;
 	}
 
 	/**
@@ -348,6 +354,7 @@ class StreamDeck {
 	 */
 	static onSystemDidWakeUp(fn) {
 		this.#on(SYSTEM_DID_WAKE_UP, (jsn) => fn(jsn));
+		return this;
 	}
 }
 

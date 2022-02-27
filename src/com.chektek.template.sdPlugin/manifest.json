@@ -1,4 +1,27 @@
 {
+	"SDKVersion": 2,
+	"Author": "ChekTek LLC",
+	"CodePath": "app.html",
+	"Description": "Example description",
+	"Name": "Stream Deck Template",
+	"Icon": "actions/template/assets/action",
+	"URL": "https://www.chektek.com/",
+	"Version": "1.0.0",
+	"Category":"Template",
+	"CategoryIcon":"actions/template/assets/actionimage",
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "10.11"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Software": {
+		"MinimumVersion": "4.1"
+	},
 	"Actions": [
 		{
 			"Icon": "actions/template/assets/actionimage",
@@ -12,26 +35,5 @@
 			"UUID": "com.chektek.template.action",
 			"PropertyInspectorPath": "actions/template/property-inspector/inspector.html"
 		}
-	],
-	"SDKVersion": 2,
-	"Author": "ChekTek LLC",
-	"CodePath": "app.html",
-	"Description": "Example description",
-	"Name": "Stream Deck Template",
-	"Icon": "actions/template/assets/action",
-	"URL": "https://www.chektek.com/",
-	"Version": "1.0.0",
-	"OS": [
-		{
-			"Platform": "mac",
-			"MinimumVersion": "10.11"
-		},
-		{
-			"Platform": "windows",
-			"MinimumVersion": "10"
-		}
-	],
-	"Software": {
-		"MinimumVersion": "4.1"
-	}
+	]
 }

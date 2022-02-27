@@ -28,3 +28,7 @@ StreamDeck.onConnected(({actionInfo, appInfo, connection, messageType, port, uui
     });
 });
 ```
+
+### Scripts
+
+You can configure the scripts in package.json to bundle the plugin following the steps listed [here](https://gist.github.com/ChekTek/5b2d18651ed2c87f19ea9ecd0dd3ce88)

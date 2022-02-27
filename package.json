@@ -1,0 +1,8 @@
+{
+	"scripts": {
+	  "distribute-windows": "distribute -b -i ./src/com.chektek.template.sdPlugin/ -o ./release/",
+	  "distribute-macos": "distribute -b -i ./src/com.chektek.template.sdPlugin/ -o ./release/",
+	  "redistribute-windows": "del-cli ./release/com.chektek.template.streamDeckPlugin && npm run-script distribute-windows",
+	  "redistribute-macos": "rm ./release/com.chektek.template.streamDeckPlugin && npm run-script distribute-macos"
+	}
+  }
